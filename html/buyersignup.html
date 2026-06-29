@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry Autos | Seller Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase modular SDK via importmap (same pattern as seller dashboard) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app":      "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+            "firebase/auth":     "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+            "firebase/firestore":"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+            "firebase/storage":  "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --bg-primary: #f7f5f2;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f0ede8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #5a5a5a;
+            --text-tertiary: #888888;
+            --accent: #c8a050;
+            --accent-hover: #b8903a;
+            --accent-light: #f5ecd7;
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.7);
+            --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            --input-bg: #f9f8f6;
+            --input-border: #e0dcd5;
+            --input-focus-border: #c8a050;
+            --input-focus-shadow: 0 0 0 4px rgba(200, 160, 80, 0.12);
+            --error: #d9444f;
+            --error-bg: #fef2f3;
+            --success: #2d8b4e;
+            --success-bg: #edf7f0;
+            --warning: #e8a840;
+            --warning-bg: #fef9ee;
+            --divider: #e8e4dc;
+            --strength-weak: #d9444f;
+            --strength-medium: #e8a840;
+            --strength-strong: #2d8b4e;
+            --strength-very-strong: #1a6b3c;
+            --toggle-bg: #e8e4dc;
+            --toggle-dot: #ffffff;
+            --hero-overlay: rgba(0, 0, 0, 0.45);
+            --font-heading: 'Georgia', 'Times New Roman', serif;
+            --font-body: 'Segoe UI', 'Inter', 'Helvetica Neue', sans-serif;
+            --transition-speed: 0.35s;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0d0d0f;
+            --bg-secondary: #16161a;
+            --bg-tertiary: #1c1c21;
+            --text-primary: #e8e6e2;
+            --text-secondary: #b0aea8;
+            --text-tertiary: #7a7872;
+            --accent: #d4aa50;
+            --accent-hover: #e0b960;
+            --accent-light: #2a2418;
+            --glass-bg: rgba(22, 22, 26, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.38);
+            --input-bg: #1c1c21;
+            --input-border: #2e2e35;
+            --input-focus-border: #d4aa50;
+            --input-focus-shadow: 0 0 0 4px rgba(212, 170, 80, 0.15);
+            --error: #f0606a;
+            --error-bg: #2a1518;
+            --success: #3dbf6e;
+            --success-bg: #15261c;
+            --warning: #f0b840;
+            --warning-bg: #2a2215;
+            --divider: #2a2a30;
+            --strength-weak: #f0606a;
+            --strength-medium: #f0b840;
+            --strength-strong: #3dbf6e;
+            --strength-very-strong: #28c76f;
+            --toggle-bg: #2e2e35;
+            --toggle-dot: #d4aa50;
+            --hero-overlay: rgba(0, 0, 0, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background var(--transition-speed), color var(--transition-speed);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        body::-webkit-scrollbar { width: 8px; }
+        body::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+        body::-webkit-scrollbar-thumb { background: var(--input-border); border-radius: 10px; }
+
+        /* ── Theme Toggle ── */
+        .theme-toggle-wrapper {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            display: flex; align-items: center; gap: 10px;
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); border-radius: 50px;
+            padding: 8px 16px; box-shadow: var(--glass-shadow);
+            transition: all var(--transition-speed);
+        }
+        .theme-toggle-wrapper:hover { transform: translateY(-2px); }
+        .theme-icon { font-size: 1rem; color: var(--text-secondary); }
+        .theme-toggle-btn {
+            position: relative; width: 50px; height: 28px;
+            background: var(--toggle-bg); border-radius: 50px;
+            cursor: pointer; border: none; outline: none;
+            transition: background var(--transition-speed);
+        }
+        .toggle-dot {
+            position: absolute; top: 4px; left: 4px;
+            width: 20px; height: 20px; background: var(--toggle-dot);
+            border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.2);
+            transition: all 0.3s cubic-bezier(.4,0,.2,1);
+        }
+        [data-theme="dark"] .toggle-dot { left: 26px; }
+
+        /* ── Layout ── */
+        .main-container { display: flex; min-height: 100vh; }
+
+        /* ── Hero ── */
+        .hero-section {
+            flex: 1;
+            background: url('https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1400&q=80') center 30% / cover no-repeat;
+            display: flex; align-items: flex-end;
+            min-height: 100vh; overflow: hidden; position: relative;
+        }
+        .hero-overlay { position: absolute; inset: 0; background: var(--hero-overlay); }
+        .hero-content {
+            position: relative; z-index: 2;
+            padding: 60px 50px; color: #fff; max-width: 600px;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,.15); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,.25); color: #fff;
+            padding: 8px 18px; border-radius: 50px;
+            font-size: .8rem; font-weight: 600; letter-spacing: .06em;
+            text-transform: uppercase; margin-bottom: 20px;
+        }
+        .hero-content h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 700;
+            line-height: 1.15; margin-bottom: 16px;
+        }
+        .accent-word { color: #e0c070; }
+        .hero-content p {
+            font-size: 1.05rem; color: rgba(255,255,255,.85);
+            max-width: 440px; margin-bottom: 28px;
+        }
+        .hero-features { display: flex; gap: 24px; flex-wrap: wrap; }
+        .hero-feature-item { display: flex; align-items: center; gap: 10px; font-size: .9rem; color: rgba(255,255,255,.9); }
+        .hero-feature-item i {
+            font-size: 1.1rem; color: #e0c070;
+            background: rgba(255,255,255,.12);
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ── Signup Card ── */
+        .signup-section {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 40px 30px; background: var(--bg-primary);
+            transition: background var(--transition-speed); position: relative; min-height: 100vh;
+        }
+        .signup-card {
+            width: 100%; max-width: 500px;
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
+            padding: 40px 36px; box-shadow: var(--glass-shadow);
+            transition: all var(--transition-speed);
+        }
+
+        /* ── Logo ── */
+        .logo-container { text-align: center; margin-bottom: 10px; }
+        .logo-link { text-decoration: none; display: inline-block; }
+        .logo-emblem {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #c8a050, #a07830);
+            border-radius: 14px; margin-bottom: 6px;
+            box-shadow: 0 6px 20px rgba(200,160,80,.35);
+            transition: transform .3s;
+        }
+        .logo-emblem i { font-size: 1.6rem; color: #fff; }
+        .logo-link:hover .logo-emblem { transform: scale(1.06); }
+        .logo-text {
+            font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700;
+            letter-spacing: .04em; color: var(--text-primary); display: block;
+        }
+        .logo-accent { color: var(--accent); }
+        .logo-subtitle { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-tertiary); }
+
+        /* ── Form heading ── */
+        .signup-heading { text-align: center; margin-bottom: 26px; }
+        .signup-heading h2 { font-family: var(--font-heading); font-size: 1.55rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .signup-heading p { font-size: .88rem; color: var(--text-secondary); }
+
+        /* ── Form ── */
+        .signup-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-row { display: flex; gap: 14px; }
+        .form-row .form-group { flex: 1; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; position: relative; }
+        .form-group label {
+            font-size: .82rem; font-weight: 600; color: var(--text-secondary);
+            letter-spacing: .02em; display: flex; align-items: center; gap: 6px;
+        }
+        .form-group label i { font-size: .85rem; color: var(--accent); }
+        .form-group input, .form-group select {
+            width: 100%; padding: 13px 16px; font-size: .95rem;
+            font-family: var(--font-body);
+            background: var(--input-bg); border: 2px solid var(--input-border);
+            border-radius: var(--radius-md); color: var(--text-primary);
+            transition: all .25s; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--input-focus-border);
+            box-shadow: var(--input-focus-shadow);
+            background: var(--bg-secondary);
+        }
+        .form-group input.error-field { border-color: var(--error); box-shadow: 0 0 0 4px rgba(217,68,79,.1); }
+        .form-group input.success-field { border-color: var(--success); box-shadow: 0 0 0 4px rgba(45,139,78,.08); }
+        .error-message { font-size: .75rem; color: var(--error); min-height: 18px; display: flex; align-items: center; gap: 4px; }
+
+        /* Password */
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 44px; }
+        .toggle-password {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: var(--text-tertiary); font-size: 1.05rem; padding: 6px;
+            transition: color .2s; z-index: 2;
+        }
+        .toggle-password:hover { color: var(--accent); }
+
+        /* Password strength */
+        .password-strength-bar {
+            height: 5px; border-radius: 10px; background: var(--input-border);
+            margin-top: 2px; overflow: hidden;
+        }
+        .password-strength-fill { height: 100%; border-radius: 10px; width: 0%; transition: width .4s, background .4s; }
+        .strength-label { font-size: .72rem; font-weight: 600; text-align: right; margin-top: 1px; }
+
+        /* Profile upload */
+        .profile-upload-group { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .profile-preview-container {
+            position: relative; width: 72px; height: 72px; border-radius: 50%;
+            overflow: hidden; flex-shrink: 0; border: 3px solid var(--input-border);
+            background: var(--input-bg); display: flex; align-items: center; justify-content: center;
+            transition: all .3s;
+        }
+        .profile-preview-container.has-image { border-color: var(--accent); box-shadow: 0 0 0 5px var(--accent-light); }
+        .profile-preview-container img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .profile-preview-container img.visible { display: block; }
+        .profile-preview-placeholder { font-size: 2rem; color: var(--text-tertiary); }
+        .profile-upload-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; font-size: .85rem; font-weight: 600;
+            background: var(--bg-tertiary); color: var(--text-primary);
+            border: 2px dashed var(--input-border); border-radius: var(--radius-md);
+            cursor: pointer; transition: all .25s;
+        }
+        .profile-upload-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .profile-upload-input { display: none; }
+        .profile-remove-btn {
+            display: none; background: none; border: none; color: var(--error);
+            cursor: pointer; font-size: .8rem; font-weight: 600;
+            padding: 4px 8px; transition: opacity .2s;
+        }
+        .profile-remove-btn.visible { display: inline-block; }
+        .profile-remove-btn:hover { opacity: .75; }
+
+        /* Upload progress bar */
+        .upload-progress-wrap {
+            height: 4px; border-radius: 2px; background: var(--input-border);
+            overflow: hidden; margin-top: 4px; display: none;
+        }
+        .upload-progress-fill {
+            height: 100%; width: 0%; background: var(--accent);
+            border-radius: 2px; transition: width .2s;
+        }
+
+        /* Terms */
+        .terms-group { display: flex; align-items: flex-start; gap: 10px; margin-top: 2px; }
+        .terms-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+        .terms-group label { font-size: .82rem; color: var(--text-secondary); cursor: pointer; line-height: 1.5; }
+        .terms-group label a { color: var(--accent); font-weight: 600; text-decoration: underline; }
+        .terms-group label a:hover { color: var(--accent-hover); }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%; padding: 15px 24px; font-size: 1rem; font-weight: 700;
+            font-family: var(--font-body); letter-spacing: .06em;
+            background: linear-gradient(135deg, #c8a050, #a07830); color: #fff;
+            border: none; border-radius: var(--radius-md); cursor: pointer;
+            transition: all .3s; position: relative; overflow: hidden;
+            box-shadow: 0 8px 28px rgba(200,160,80,.3); text-transform: uppercase;
+        }
+        .submit-btn:hover { background: linear-gradient(135deg,#d4ae58,#b08838); box-shadow: 0 12px 34px rgba(200,160,80,.4); transform: translateY(-2px); }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled { opacity: .6; cursor: not-allowed; pointer-events: none; }
+        .btn-text { transition: opacity .2s; }
+        .btn-spinner {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            display: none; width: 22px; height: 22px;
+            border: 3px solid rgba(255,255,255,.3); border-top-color: #fff;
+            border-radius: 50%; animation: spin .7s linear infinite;
+        }
+        .submit-btn.loading .btn-text { opacity: 0; }
+        .submit-btn.loading .btn-spinner { display: block; }
+
+        /* Divider */
+        .divider {
+            display: flex; align-items: center; gap: 14px;
+            color: var(--text-tertiary); font-size: .78rem; font-weight: 500; letter-spacing: .04em;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--divider); }
+
+        /* Social buttons */
+        .social-signup-row { display: flex; gap: 12px; justify-content: center; }
+        .social-btn {
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 2px solid var(--input-border); background: var(--input-bg);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem; color: var(--text-secondary); transition: all .25s;
+        }
+        .social-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); transform: translateY(-3px); }
+        .social-btn.loading { pointer-events: none; opacity: .5; }
+
+        /* Sign-in link */
+        .signin-link { text-align: center; font-size: .85rem; color: var(--text-secondary); }
+        .signin-link a { color: var(--accent); font-weight: 700; text-decoration: none; }
+        .signin-link a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+        /* ── Toasts ── */
+        .toast-container {
+            position: fixed; top: 24px; right: 24px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 12px; pointer-events: none;
+        }
+        .toast {
+            pointer-events: all; min-width: 300px; max-width: 440px;
+            padding: 16px 20px; border-radius: var(--radius-md);
+            font-size: .9rem; font-weight: 500;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 12px 36px rgba(0,0,0,.2);
+            animation: toastIn .4s cubic-bezier(.22,.61,.36,1) forwards;
+            backdrop-filter: blur(12px); letter-spacing: .01em;
+        }
+        .toast.out { animation: toastOut .35s forwards; }
+        .toast-success { background: var(--success-bg); border: 1px solid var(--success); color: var(--success); }
+        .toast-error   { background: var(--error-bg);   border: 1px solid var(--error);   color: var(--error); }
+        .toast-warning { background: var(--warning-bg); border: 1px solid var(--warning); color: var(--warning); }
+        .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .toast-close { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; opacity: .7; font-size: 1rem; padding: 4px; }
+        .toast-close:hover { opacity: 1; }
+
+        /* ── Keyframes ── */
+        @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+        @keyframes toastIn  { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+
+        /* ── Responsive ── */
+        @media (max-width: 1024px) {
+            .main-container { flex-direction: column; }
+            .hero-section { min-height: 360px; flex: none; }
+            .hero-content { padding: 36px 24px; }
+            .hero-content h1 { font-size: 1.8rem; }
+            .signup-section { padding: 16px 16px 40px; min-height: auto; }
+            .signup-card { padding: 28px 20px; margin-top: -28px; border-radius: var(--radius-lg); }
+            .form-row { flex-direction: column; gap: 16px; }
+        }
+        @media (max-width: 480px) {
+            .hero-section { min-height: 240px; }
+            .hero-content { padding: 20px 14px; }
+            .hero-content h1 { font-size: 1.35rem; }
+            .signup-card { padding: 20px 12px; }
+            .profile-preview-container { width: 56px; height: 56px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Theme toggle -->
+<div class="theme-toggle-wrapper">
+    <i class="fa-solid fa-sun theme-icon"></i>
+    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle dark mode">
+        <span class="toggle-dot"></span>
+    </button>
+    <i class="fa-solid fa-moon theme-icon"></i>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="main-container">
+
+    <!-- ════ HERO ════ -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-badge">✦ Become a Jerry Autos Seller</span>
+            <h1>List Your <span class="accent-word">Luxury Vehicle</span> Today</h1>
+            <p>Join our premium marketplace and connect with serious buyers across Nigeria.</p>
+            <div class="hero-features">
+                <div class="hero-feature-item"><i class="fa-solid fa-chart-line"></i><span>Reach Verified Buyers</span></div>
+                <div class="hero-feature-item"><i class="fa-solid fa-gem"></i><span>Premium Listings</span></div>
+                <div class="hero-feature-item"><i class="fa-solid fa-headset"></i><span>Dedicated Support</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════ FORM ════ -->
+    <section class="signup-section">
+        <div class="signup-card">
+
+            <div class="logo-container">
+                <a href="#" class="logo-link">
+                    <div class="logo-emblem"><i class="fa-solid fa-car"></i></div>
+                    <span class="logo-text">Jerry <span class="logo-accent">Autos</span></span>
+                    <span class="logo-subtitle">Premium Seller Registration</span>
+                </a>
+            </div>
+
+            <div class="signup-heading">
+                <h2>Create Your Seller Account</h2>
+                <p>Sign up to list and manage your vehicles</p>
+            </div>
+
+            <form class="signup-form" id="signupForm" novalidate>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="fullName"><i class="fa-solid fa-user"></i> Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name" autocomplete="name">
+                    <span class="error-message" id="fullNameError"></span>
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username"><i class="fa-solid fa-at"></i> Username</label>
+                    <input type="text" id="username" placeholder="Choose a username" autocomplete="username">
+                    <span class="error-message" id="usernameError"></span>
+                </div>
+
+                <!-- Email & Phone -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email"><i class="fa-solid fa-envelope"></i> Email</label>
+                        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+                        <span class="error-message" id="emailError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone"><i class="fa-solid fa-phone"></i> Phone</label>
+                        <input type="tel" id="phone" placeholder="+234 800 000 0000" autocomplete="tel">
+                        <span class="error-message" id="phoneError"></span>
+                    </div>
+                </div>
+
+                <!-- City -->
+                <div class="form-group">
+                    <label for="city"><i class="fa-solid fa-location-dot"></i> City / State</label>
+                    <input type="text" id="city" placeholder="Lagos, Nigeria" autocomplete="address-level2">
+                    <span class="error-message" id="cityError"></span>
+                </div>
+
+                <!-- Profile Photo -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-camera"></i> Profile Photo <span style="color:var(--text-tertiary);font-weight:400">(optional)</span></label>
+                    <div class="profile-upload-group">
+                        <div class="profile-preview-container" id="profilePreviewContainer">
+                            <img id="profilePreviewImg" src="" alt="Preview">
+                            <i class="fa-solid fa-user-large profile-preview-placeholder" id="profilePlaceholder"></i>
+                        </div>
+                        <label class="profile-upload-btn" for="profileUploadInput">
+                            <i class="fa-solid fa-upload"></i> Upload Photo
+                        </label>
+                        <input type="file" class="profile-upload-input" id="profileUploadInput" accept="image/jpeg,image/png,image/webp">
+                        <button type="button" class="profile-remove-btn" id="profileRemoveBtn">
+                            <i class="fa-solid fa-trash-can"></i> Remove
+                        </button>
+                    </div>
+                    <!-- Upload progress (shown while uploading to Firebase Storage) -->
+                    <div class="upload-progress-wrap" id="uploadProgressWrap">
+                        <div class="upload-progress-fill" id="uploadProgressFill"></div>
+                    </div>
+                    <span class="error-message" id="profileError"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
+                        <button type="button" class="toggle-password" data-target="password"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <div class="password-strength-bar"><div class="password-strength-fill" id="strengthFill"></div></div>
+                    <span class="strength-label" id="strengthLabel"></span>
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirmPassword"><i class="fa-solid fa-lock"></i> Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password">
+                        <button type="button" class="toggle-password" data-target="confirmPassword"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <span class="error-message" id="confirmPasswordError"></span>
+                </div>
+
+                <!-- Terms -->
+                <div class="terms-group">
+                    <input type="checkbox" id="termsCheckbox">
+                    <label for="termsCheckbox">I agree to the <a href="#" target="_blank">Terms &amp; Conditions</a> and <a href="#" target="_blank">Privacy Policy</a> of Jerry Autos.</label>
+                </div>
+                <span class="error-message" id="termsError"></span>
+
+                <!-- Submit -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text">Create Buyer Account</span>
+                    <span class="btn-spinner"></span>
+                </button>
+            </form>
+
+            <div class="divider" style="margin:18px 0 14px">or sign up with</div>
+
+            <div class="social-signup-row">
+                <button class="social-btn" id="googleBtn" title="Google"><i class="fa-brands fa-google"></i></button>
+                <button class="social-btn" id="facebookBtn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></button>
+                <button class="social-btn" id="appleBtn" title="Apple"><i class="fa-brands fa-apple"></i></button>
+            </div>
+
+            <p class="signin-link" style="margin-top:18px">
+                Already have an account? <a href="buyerlogin.html">Sign In</a>
+            </p>
+        </div>
+    </section>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     FIREBASE + APP LOGIC  (modular ES module)
+     ════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp }       from "firebase/app";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    updateProfile,
+    signInWithPopup,
+    GoogleAuthProvider,
+    FacebookAuthProvider,
+    OAuthProvider,
+    onAuthStateChanged
+} from "firebase/auth";
+import {
+    getFirestore,
+    doc, setDoc, serverTimestamp
+} from "firebase/firestore";
+import {
+    getStorage,
+    ref as storageRef,
+    uploadBytesResumable,
+    getDownloadURL
+} from "firebase/storage";
+
+/* ═══════════════════════════════════════
+   FIREBASE INIT  — same project as dashboard
+   ═══════════════════════════════════════ */
+const firebaseConfig = {
+    apiKey:            "AIzaSyD6ZVDHScoK2DnL-vI4WcqSqXA8bLO4Ua4",
+    authDomain:        "myblog-508d5.firebaseapp.com",
+    databaseURL:       "https://myblog-508d5-default-rtdb.firebaseio.com",
+    projectId:         "myblog-508d5",
+    storageBucket:     "myblog-508d5.firebasestorage.app",
+    messagingSenderId: "521781823289",
+    appId:             "1:521781823289:web:c6dea9369689a844548ae8"
+};
+
+const fbApp   = initializeApp(firebaseConfig);
+const auth    = getAuth(fbApp);
+const db      = getFirestore(fbApp);
+const storage = getStorage(fbApp);
+
+/* ═══════════════════════════════════════
+   AUTO-REDIRECT if already signed in
+   ═══════════════════════════════════════ */
+// onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//         /* Already logged in — go straight to the dashboard */
+//         window.location.href = 'buyerdashboard.html';
+//     }
+// });
+
+/* ═══════════════════════════════════════
+   DOM REFS
+   ═══════════════════════════════════════ */
+const htmlEl              = document.documentElement;
+const themeToggleBtn      = document.getElementById('themeToggleBtn');
+const signupForm          = document.getElementById('signupForm');
+const submitBtn           = document.getElementById('submitBtn');
+const toastContainer      = document.getElementById('toastContainer');
+
+const fullNameInput       = document.getElementById('fullName');
+const usernameInput       = document.getElementById('username');
+const emailInput          = document.getElementById('email');
+const phoneInput          = document.getElementById('phone');
+const cityInput           = document.getElementById('city');
+const passwordInput       = document.getElementById('password');
+const confirmPasswordInput= document.getElementById('confirmPassword');
+const termsCheckbox       = document.getElementById('termsCheckbox');
+
+const profileUploadInput  = document.getElementById('profileUploadInput');
+const profilePreviewImg   = document.getElementById('profilePreviewImg');
+const profilePreviewCont  = document.getElementById('profilePreviewContainer');
+const profilePlaceholder  = document.getElementById('profilePlaceholder');
+const profileRemoveBtn    = document.getElementById('profileRemoveBtn');
+const uploadProgressWrap  = document.getElementById('uploadProgressWrap');
+const uploadProgressFill  = document.getElementById('uploadProgressFill');
+
+const strengthFill        = document.getElementById('strengthFill');
+const strengthLabel       = document.getElementById('strengthLabel');
+
+const errors = {
+    fullName:        document.getElementById('fullNameError'),
+    username:        document.getElementById('usernameError'),
+    email:           document.getElementById('emailError'),
+    phone:           document.getElementById('phoneError'),
+    city:            document.getElementById('cityError'),
+    password:        document.getElementById('passwordError'),
+    confirmPassword: document.getElementById('confirmPasswordError'),
+    terms:           document.getElementById('termsError'),
+    profile:         document.getElementById('profileError'),
+};
+
+/* ═══════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════ */
+let selectedFile       = null;   // raw File object chosen by user
+let isSubmitting       = false;
+let pendingSocialUser  = null;   // Firebase user from social sign-in needing extra fields
+
+/* ═══════════════════════════════════════
+   THEME
+   ═══════════════════════════════════════ */
+const savedTheme = localStorage.getItem('jerry-autos-theme') || 'light';
+htmlEl.setAttribute('data-theme', savedTheme);
+
+themeToggleBtn.addEventListener('click', () => {
+    const next = htmlEl.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    htmlEl.setAttribute('data-theme', next);
+    localStorage.setItem('jerry-autos-theme', next);
+});
+
+/* ═══════════════════════════════════════
+   TOASTS
+   ═══════════════════════════════════════ */
+function showToast(message, type = 'success', duration = 4500) {
+    const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', warning: 'fa-triangle-exclamation' };
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <i class="fa-solid ${icons[type]} toast-icon"></i>
+        <span>${message}</span>
+        <button class="toast-close" aria-label="Close">&times;</button>`;
+    toastContainer.appendChild(toast);
+
+    const remove = () => {
+        toast.classList.add('out');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+    };
+    toast.querySelector('.toast-close').addEventListener('click', remove);
+    setTimeout(remove, duration);
+}
+
+/* ═══════════════════════════════════════
+   PASSWORD VISIBILITY TOGGLE
+   ═══════════════════════════════════════ */
+document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        const icon  = btn.querySelector('i');
+        const show  = input.type === 'password';
+        input.type  = show ? 'text' : 'password';
+        icon.className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    });
+});
+
+/* ═══════════════════════════════════════
+   PASSWORD STRENGTH
+   ═══════════════════════════════════════ */
+function measureStrength(pwd) {
+    let s = 0;
+    if (pwd.length >= 8)  s++;
+    if (pwd.length >= 12) s++;
+    if (/[A-Z]/.test(pwd))        s++;
+    if (/[a-z]/.test(pwd))        s++;
+    if (/[0-9]/.test(pwd))        s++;
+    if (/[^A-Za-z0-9]/.test(pwd)) s++;
+
+    if (s >= 5) return { w: '100%', c: 'var(--strength-very-strong)', l: 'Very Strong', s };
+    if (s >= 4) return { w: '75%',  c: 'var(--strength-strong)',      l: 'Strong',      s };
+    if (s >= 3) return { w: '50%',  c: 'var(--strength-medium)',      l: 'Medium',      s };
+    if (s >= 1) return { w: '25%',  c: 'var(--strength-weak)',        l: 'Weak',        s };
+    return           { w: '8%',   c: 'var(--strength-weak)',          l: 'Too Short',   s: 0 };
+}
+
+passwordInput.addEventListener('input', () => {
+    const pwd = passwordInput.value;
+    if (!pwd) { strengthFill.style.width = '0%'; strengthLabel.textContent = ''; return; }
+    const r = measureStrength(pwd);
+    strengthFill.style.width      = r.w;
+    strengthFill.style.background = r.c;
+    strengthLabel.textContent     = r.l;
+    strengthLabel.style.color     = r.c;
+});
+
+/* ═══════════════════════════════════════
+   PROFILE PHOTO PREVIEW
+   ═══════════════════════════════════════ */
+profileUploadInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        errors.profile.textContent = 'Please choose an image file.';
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        errors.profile.textContent = 'Image must be under 5 MB.';
+        return;
+    }
+
+    errors.profile.textContent = '';
+    selectedFile = file;
+
+    /* Local preview only — actual upload happens on form submit */
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        profilePreviewImg.src = e.target.result;
+        profilePreviewImg.classList.add('visible');
+        profilePlaceholder.style.display  = 'none';
+        profilePreviewCont.classList.add('has-image');
+        profileRemoveBtn.classList.add('visible');
+    };
+    reader.readAsDataURL(file);
+});
+
+profileRemoveBtn.addEventListener('click', () => {
+    selectedFile = null;
+    profilePreviewImg.src = '';
+    profilePreviewImg.classList.remove('visible');
+    profilePlaceholder.style.display = '';
+    profilePreviewCont.classList.remove('has-image');
+    profileRemoveBtn.classList.remove('visible');
+    profileUploadInput.value = '';
+    errors.profile.textContent = '';
+});
+
+/* ═══════════════════════════════════════
+   VALIDATION HELPERS
+   ═══════════════════════════════════════ */
+function setErr(field, msg) {
+    if (errors[field]) errors[field].textContent = msg;
+    const el = document.getElementById(field) || document.getElementById(field.replace(/([A-Z])/g,'$1'));
+    if (el) { el.classList.add('error-field'); el.classList.remove('success-field'); }
+}
+function setOk(field) {
+    if (errors[field]) errors[field].textContent = '';
+    const el = document.getElementById(field);
+    if (el) { el.classList.remove('error-field'); el.classList.add('success-field'); }
+}
+function clearF(field) {
+    if (errors[field]) errors[field].textContent = '';
+    const el = document.getElementById(field);
+    if (el) el.classList.remove('error-field','success-field');
+}
+
+const v = {
+    fullName:        s => !s.trim() ? 'Required.' : s.trim().length < 2 ? 'At least 2 chars.' : !/^[a-zA-Z\s\-'.]+$/.test(s.trim()) ? 'Invalid characters.' : null,
+    username:        s => !s.trim() ? 'Required.' : s.trim().length < 3 ? 'At least 3 chars.' : s.trim().length > 30 ? 'Max 30 chars.' : !/^[a-zA-Z0-9_]+$/.test(s.trim()) ? 'Letters, numbers, _ only.' : null,
+    email:           s => !s.trim() ? 'Required.' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim()) ? 'Invalid email.' : null,
+    phone:           s => !s.trim() ? 'Required.' : !/^\+?\d{7,15}$/.test(s.replace(/[\s\-().]/g,'')) ? 'Invalid phone.' : null,
+    city:            s => !s.trim() ? 'Required.' : s.trim().length < 2 ? 'Enter a valid city.' : null,
+    password:        s => !s ? 'Required.' : s.length < 8 ? 'At least 8 characters.' : measureStrength(s).s < 3 ? 'Too weak — add uppercase, numbers or symbols.' : null,
+    confirmPassword: (s, pwd) => !s ? 'Required.' : s !== pwd ? 'Passwords do not match.' : null,
+};
+
+/* Real-time blur validation */
+[
+    ['fullName', () => v.fullName(fullNameInput.value)],
+    ['username', () => v.username(usernameInput.value)],
+    ['email',    () => v.email(emailInput.value)],
+    ['phone',    () => v.phone(phoneInput.value)],
+    ['city',     () => v.city(cityInput.value)],
+    ['password', () => v.password(passwordInput.value)],
+].forEach(([field, check]) => {
+    const el = document.getElementById(field);
+    el.addEventListener('blur',  () => { const e = check(); e ? setErr(field, e) : setOk(field); });
+    el.addEventListener('input', () => clearF(field));
+});
+
+confirmPasswordInput.addEventListener('blur', () => {
+    const e = v.confirmPassword(confirmPasswordInput.value, passwordInput.value);
+    e ? setErr('confirmPassword', e) : setOk('confirmPassword');
+});
+confirmPasswordInput.addEventListener('input', () => clearF('confirmPassword'));
+termsCheckbox.addEventListener('change', () => { if (termsCheckbox.checked) errors.terms.textContent = ''; });
+
+/* ═══════════════════════════════════════
+   UPLOAD PHOTO TO FIREBASE STORAGE
+   Returns the permanent download URL.
+   Path: sellers/{uid}/avatar
+   ═══════════════════════════════════════ */
+async function uploadAvatarToStorage(uid, file) {
+    return new Promise((resolve, reject) => {
+        const ref  = storageRef(storage, `sellers/${uid}/avatar`);
+        const task = uploadBytesResumable(ref, file);
+
+        uploadProgressWrap.style.display = 'block';
+
+        task.on('state_changed',
+            (snap) => {
+                const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+                uploadProgressFill.style.width = pct + '%';
+                errors.profile.textContent     = `Uploading photo… ${pct}%`;
+                errors.profile.style.color     = 'var(--accent)';
+            },
+            (err) => {
+                uploadProgressWrap.style.display = 'none';
+                uploadProgressFill.style.width   = '0%';
+                errors.profile.textContent = '';
+                errors.profile.style.color = '';
+                reject(err);
+            },
+            async () => {
+                uploadProgressWrap.style.display = 'none';
+                uploadProgressFill.style.width   = '0%';
+                errors.profile.textContent = '';
+                errors.profile.style.color = '';
+                const url = await getDownloadURL(task.snapshot.ref);
+                resolve(url);
+            }
+        );
+    });
+}
+
+/* ═══════════════════════════════════════
+   SAVE BUYER PROFILE TO FIRESTORE
+   Document: buyers/{uid}
+   Schema mirrors exactly what buyerdashboard.html reads in watchAuth()
+   ═══════════════════════════════════════ */
+async function saveBuyerToFirestore(uid, data) {
+    await setDoc(doc(db, 'buyers', uid), {
+        username:    data.username,
+        fullName:    data.fullName,
+        phone:       data.phone,
+        city:        data.city,
+        photoURL:    data.photoURL || null,
+        email:       data.email,
+        accountType: 'buyer',
+        registeredAt: serverTimestamp(),
+    }, { merge: true });
+}
+
+/* ═══════════════════════════════════════
+   COMPLETE REGISTRATION
+   Called after auth user exists (email or social).
+   1. Upload photo to Storage (if a file was chosen)
+   2. Call updateProfile() to set displayName + photoURL on Auth
+   3. Write buyers/{uid} doc to Firestore
+   4. Redirect to buyerdashboard.html
+   ═══════════════════════════════════════ */
+async function completeRegistration(user, formData) {
+    let photoURL = user.photoURL || null;  // default to social provider photo
+
+    /* Upload local file if user picked one */
+    if (selectedFile) {
+        try {
+            photoURL = await uploadAvatarToStorage(user.uid, selectedFile);
+        } catch (uploadErr) {
+            console.warn('Photo upload failed, continuing without photo:', uploadErr);
+            showToast('Photo upload failed — account created without photo.', 'warning');
+        }
+    }
+
+    /* 1. Update Firebase Auth profile (displayName + photoURL) */
+    await updateProfile(user, {
+        displayName: formData.fullName,
+        photoURL:    photoURL || null,
+    });
+
+    /* 2. Write Firestore buyers document */
+    await saveBuyerToFirestore(user.uid, {
+        fullName: formData.fullName,
+        username: formData.username,
+        email:    formData.email || user.email,
+        phone:    formData.phone,
+        city:     formData.city,
+        photoURL,
+    });
+
+    showToast('Account created! Redirecting to your dashboard…', 'success', 3000);
+
+    /* 3. Redirect after short delay so user sees the toast */
+    setTimeout(() => {
+        window.location.href = 'buyerdashboard.html';
+    }, 1800);
+}
+
+/* ═══════════════════════════════════════
+   FORM SUBMIT  (email + password flow)
+   ═══════════════════════════════════════ */
+signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    /* Collect values */
+    const fullName       = fullNameInput.value.trim();
+    const username       = usernameInput.value.trim();
+    const email          = emailInput.value.trim();
+    const phone          = phoneInput.value.trim();
+    const city           = cityInput.value.trim();
+    const password       = passwordInput.value;
+    const confirmPassword= confirmPasswordInput.value;
+
+    /* Validate every field */
+    const fieldErrors = {
+        fullName:        v.fullName(fullName),
+        username:        v.username(username),
+        email:           v.email(email),
+        phone:           v.phone(phone),
+        city:            v.city(city),
+        terms:           !termsCheckbox.checked ? 'You must accept the Terms & Conditions.' : null,
+        ...(pendingSocialUser
+            ? {}   /* social user — skip password fields */
+            : {
+                password:        v.password(password),
+                confirmPassword: v.confirmPassword(confirmPassword, password),
+              }
+        ),
+    };
+
+    /* Stamp errors / clear fields */
+    Object.entries(fieldErrors).forEach(([field, err]) => err ? setErr(field, err) : setOk(field));
+    if (Object.values(fieldErrors).some(Boolean)) {
+        showToast('Please fix the highlighted errors.', 'error');
+        document.querySelector('.error-field')?.focus();
+        return;
+    }
+
+    isSubmitting = true;
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
+    try {
+        const formData = { fullName, username, email, phone, city };
+
+        if (pendingSocialUser) {
+            /* ── Completing social sign-up ── */
+            await completeRegistration(pendingSocialUser, formData);
+            pendingSocialUser = null;
+        } else {
+            /* ── Email / password sign-up ── */
+            const credential = await createUserWithEmailAndPassword(auth, email, password);
+            await completeRegistration(credential.user, formData);
+        }
+
+    } catch (err) {
+        console.error('Sign-up error:', err);
+        const friendlyErrors = {
+            'auth/email-already-in-use': () => { setErr('email', 'This email is already registered.'); return 'Email already in use.'; },
+            'auth/weak-password':         () => { setErr('password', 'Password is too weak.'); return 'Password too weak.'; },
+            'auth/invalid-email':         () => { setErr('email', 'Invalid email address.'); return 'Invalid email.'; },
+        };
+        const handler = friendlyErrors[err.code];
+        showToast(handler ? handler() : (err.message || 'Sign-up failed. Please try again.'), 'error');
+    } finally {
+        isSubmitting = false;
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+    }
+});
+
+/* ═══════════════════════════════════════
+   SOCIAL SIGN-IN HANDLER
+   ═══════════════════════════════════════ */
+async function handleSocialSignIn(provider) {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    ['googleBtn','facebookBtn','appleBtn'].forEach(id => document.getElementById(id).classList.add('loading'));
+
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user   = result.user;
+
+        /* Pre-fill form with whatever the social provider gave us */
+        if (user.displayName && !fullNameInput.value)
+            fullNameInput.value = user.displayName;
+        if (user.email && !emailInput.value)
+            emailInput.value = user.email;
+
+        /* Show social provider photo in the local preview (not uploaded yet) */
+        if (user.photoURL && !selectedFile) {
+            profilePreviewImg.src = user.photoURL;
+            profilePreviewImg.classList.add('visible');
+            profilePlaceholder.style.display = 'none';-
+            profilePreviewCont.classList.add('has-image');
+            profileRemoveBtn.classList.add('visible');
+            /* Note: selectedFile stays null — we'll use user.photoURL directly
+               unless the user explicitly picks a new file */
+        }
+
+        /* Check which extra required fields still need filling */
+        const missing = [];
+        if (!usernameInput.value.trim()) missing.push('username');
+        if (!phoneInput.value.trim())    missing.push('phone number');
+        if (!cityInput.value.trim())     missing.push('city');
+
+        if (missing.length > 0) {
+            /* Store user and ask them to complete the form */
+            pendingSocialUser = user;
+            showToast(
+                `Great! Please fill in your ${missing.join(', ')} then click "Create Seller Account".`,
+                'warning', 7000
+            );
+            /* Focus first missing field */
+            if (!usernameInput.value.trim())    usernameInput.focus();
+            else if (!phoneInput.value.trim())  phoneInput.focus();
+            else                                cityInput.focus();
+        } else {
+            /* All required fields already filled — complete immediately */
+            await completeRegistration(user, {
+                fullName: fullNameInput.value.trim(),
+                username: usernameInput.value.trim(),
+                email:    user.email,
+                phone:    phoneInput.value.trim(),
+                city:     cityInput.value.trim(),
+            });
+        }
+
+    } catch (err) {
+        const msgs = {
+            'auth/account-exists-with-different-credential': 'An account already exists with a different sign-in method.',
+            'auth/popup-closed-by-user':                     'Sign-in popup was closed. Please try again.',
+            'auth/cancelled-popup-request':                  'Sign-in was cancelled.',
+        };
+        showToast(msgs[err.code] || err.message, err.code === 'auth/popup-closed-by-user' ? 'warning' : 'error');
+    } finally {
+        isSubmitting = false;
+        ['googleBtn','facebookBtn','appleBtn'].forEach(id => document.getElementById(id).classList.remove('loading'));
+    }
+}
+
+document.getElementById('googleBtn').addEventListener('click',   () => handleSocialSignIn(new GoogleAuthProvider()));
+document.getElementById('facebookBtn').addEventListener('click', () => handleSocialSignIn(new FacebookAuthProvider()));
+document.getElementById('appleBtn').addEventListener('click', () => {
+    const p = new OAuthProvider('apple.com');
+    p.addScope('email');
+    p.addScope('name');
+    handleSocialSignIn(p);
+});
+
+/* ── ESC closes toasts ── */
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        toastContainer.querySelectorAll('.toast:not(.out)').forEach(t => {
+            t.classList.add('out');
+            t.addEventListener('animationend', () => t.remove(), { once: true });
+        });
+    }
+});
+
+console.log('%c🚗 Jerry Autos Seller Sign-Up Ready', 'color:#c8a050;font-weight:bold;font-size:1.1em;');
+</script>
+</body>
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Sign In | Jerry Autos</title>
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3f4f6 100%);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: #d1d5db;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --panel-bg: rgba(255, 255, 255, 0.4);
+            --social-btn-hover: rgba(0, 0, 0, 0.05);
+            --apple-bg: #000000;
+            --apple-text: #ffffff;
+        }
+
+        .dark-mode {
+            --primary-color: #3b82f6;
+            --primary-hover: #60a5fa;
+            --bg-gradient: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+            --glass-bg: rgba(17, 24, 39, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --input-bg: rgba(31, 41, 55, 0.8);
+            --input-border: #374151;
+            --panel-bg: rgba(0, 0, 0, 0.4);
+            --social-btn-hover: rgba(255, 255, 255, 0.1);
+            --apple-bg: #ffffff;
+            --apple-text: #000000;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Abstract Automotive Background Elements */
+        .bg-shape {
+            position: absolute;
+            filter: blur(60px);
+            z-index: -1;
+            border-radius: 50%;
+        }
+        .shape1 {
+            background: rgba(37, 99, 235, 0.3);
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+        }
+        .shape2 {
+            background: rgba(16, 185, 129, 0.2);
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            right: -50px;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 0.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1000px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        /* Split Panels */
+        .seller-info, .login-section {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Left Panel - Seller Features */
+        .seller-info {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .brand-icon {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .illustration {
+            width: 100%;
+            max-width: 250px;
+            margin: 0 auto 2rem;
+            opacity: 0.8;
+        }
+
+        .stats-preview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .quick-links {
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+        }
+        .quick-links ul {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+        .quick-links li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        /* Right Panel - Login Form */
+        .login-section {
+            flex: 1;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .form-header h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .forgot-pass {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-pass:hover {
+            text-decoration: underline;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        /* Social Login UI */
+        .social-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.25rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .social-divider::before, 
+        .social-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .social-divider::before { margin-right: 1rem; }
+        .social-divider::after { margin-left: 1rem; }
+
+        .social-login-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .btn-social {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.65rem;
+            border-radius: 10px;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-social:hover {
+            background: var(--social-btn-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Tailored variant for clean layout integration of Apple styling */
+        .btn-apple {
+            background: var(--apple-bg);
+            color: var(--apple-text);
+            border: 1px solid transparent;
+        }
+        .btn-apple svg {
+            fill: var(--apple-text);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-submit.loading .spinner { display: block; }
+        .btn-submit.loading .btn-text { display: none; }
+
+        /* General Error banner styling */
+        .global-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: center;
+        }
+
+        .error-msg {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        /* Footer */
+        .footer-links {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .footer-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        .footer-links a:hover { text-decoration: underline; }
+
+        /* Notifications Toast */
+        .notification {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            transition: bottom 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 50;
+            font-weight: 500;
+        }
+        .notification.show { bottom: 2rem; }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .container { flex-direction: row; }
+            .seller-info {
+                width: 45%;
+                border-bottom: none;
+                border-right: 1px solid var(--glass-border);
+                padding: 3rem;
+            }
+            .login-section { padding: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+        <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+    <div class="container">
+        <div class="seller-info">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+                        <circle cx="7" cy="17" r="2"/>
+                        <circle cx="17" cy="17" r="2"/>
+                    </svg>
+                </div>
+                Jerry Autos
+            </div>
+
+            <svg class="illustration" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="40" width="160" height="60" rx="10" fill="var(--primary-color)" fill-opacity="0.2" stroke="var(--primary-color)" stroke-width="2"/>
+                <circle cx="60" cy="100" r="15" fill="var(--text-main)"/>
+                <circle cx="140" cy="100" r="15" fill="var(--text-main)"/>
+                <path d="M40 40 L60 20 L120 20 L140 40" stroke="var(--primary-color)" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+
+            <div class="stats-preview">
+                <div class="stat-card">
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Active Listings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Recent Sales</div>
+                </div>
+            </div>
+
+            <div class="quick-links">
+                <div class="stat-label" style="font-weight: 600; margin-bottom: 8px;">Quick Access Preview:</div>
+                <ul>
+                    <li>✓ Inventory Management</li>
+                    <li>✓ Analytics Dashboard</li>
+                    <li>✓ Buyer Messages</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="login-section">
+            <div class="form-header">
+                <div class="avatar">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <h2>Welcome Back, Seller</h2>
+                <p>Sign in to manage your dealership</p>
+            </div>
+
+            <div class="global-error" id="globalError"></div>
+
+            <form id="sellerLoginForm" novalidate>
+                <div class="input-group">
+                    <label for="username">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="username" placeholder="dealer@example.com" required>
+                    </div>
+                    <div class="error-msg" id="usernameError">Please enter a valid email address.</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="error-msg" id="passwordError">Password is required.</div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-pass" id="forgotPassLink">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="btn-text">Sign In Securely</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <div class="social-divider">
+                <span>Or continue with</span>
+            </div>
+
+            <div class="social-login-group">
+                <button type="button" class="btn-social" id="btnGoogle" aria-label="Sign in with Google">
+                    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    <span>Google</span>
+                </button>
+                <button type="button" class="btn-social" id="btnFacebook" aria-label="Sign in with Facebook">
+                    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#1877F2">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span>Facebook</span>
+                </button>
+                <button type="button" class="btn-social btn-apple" id="btnApple" aria-label="Sign in with Apple">
+                    <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.39z"/>
+                    </svg>
+                    <span>Apple</span>
+                </button>
+            </div>
+
+            <div class="footer-links">
+                <p>Not a registered seller? <a href="sellersignup.html" style="color: var(--primary-color); font-weight: 500;">Apply Now</a></p>
+                <div style="margin-top: 1rem;">
+                    <a href="#">Terms</a> • <a href="#">Privacy</a> • <a href="#">Help</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notificationToast">
+        Successfully signed in! Redirecting...
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            FacebookAuthProvider, 
+            OAuthProvider,
+            sendPasswordResetEmail
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // TODO: Replace with your actual Firebase project configuration keys
+         const firebaseConfig = {
+    apiKey: "AIzaSyD6ZVDHScoK2DnL-vI4WcqSqXA8bLO4Ua4",
+    authDomain: "myblog-508d5.firebaseapp.com",
+    databaseURL: "https://myblog-508d5-default-rtdb.firebaseio.com",
+    projectId: "myblog-508d5",
+    storageBucket: "myblog-508d5.firebasestorage.app",
+    messagingSenderId: "521781823289",
+    appId: "1:521781823289:web:c6dea9369689a844548ae8"
+  };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // UI Element Selections
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const loginForm = document.getElementById('sellerLoginForm');
+            const usernameInput = document.getElementById('username');
+            const usernameError = document.getElementById('usernameError');
+            const passwordError = document.getElementById('passwordError');
+            const globalError = document.getElementById('globalError');
+            const submitBtn = document.getElementById('submitBtn');
+            const notificationToast = document.getElementById('notificationToast');
+            const forgotPassLink = document.getElementById('forgotPassLink');
+
+            // Social Buttons
+            const btnGoogle = document.getElementById('btnGoogle');
+            const btnFacebook = document.getElementById('btnFacebook');
+            const btnApple = document.getElementById('btnApple');
+
+            // Theme Management Persistence
+            if (localStorage.getItem('jerryAutosTheme') === 'dark') {
+                body.classList.add('dark-mode');
+                updateThemeIcon(true);
+            }
+
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                const isDark = body.classList.contains('dark-mode');
+                localStorage.setItem('jerryAutosTheme', isDark ? 'dark' : 'light');
+                updateThemeIcon(isDark);
+            });
+
+            function updateThemeIcon(isDark) {
+                themeIcon.innerHTML = isDark 
+                    ? `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`
+                    : `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+            }
+
+            // Password Visibility Toggle
+            togglePassword.addEventListener('click', () => {
+                const isPrivate = passwordInput.getAttribute('type') === 'password';
+                passwordInput.setAttribute('type', isPrivate ? 'text' : 'password');
+                eyeIcon.innerHTML = isPrivate
+                    ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
+                    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            });
+
+            // Helper for handling auth success
+            function handleAuthSuccess(user) {
+                globalError.style.display = 'none';
+                notificationToast.innerText = `Welcome, ${user.displayName || user.email}! Redirecting...`;
+                notificationToast.classList.add('show');
+                setTimeout(() => {
+                    notificationToast.classList.remove('show');
+                    window.location.href = 'sellerdashboard.html'; // Redirect to seller dashboard
+                }, 2500);
+            }
+
+            // Helper for error handling
+            function handleAuthError(error) {
+                globalError.innerText = error.message.replace("Firebase: ", "");
+                globalError.style.display = 'block';
+            }
+
+            // Email/Password Login Form Action
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                usernameError.style.display = 'none';
+                passwordError.style.display = 'none';
+                globalError.style.display = 'none';
+
+                let isValid = true;
+                if (!usernameInput.value.trim() || !usernameInput.value.includes('@')) {
+                    usernameError.style.display = 'block';
+                    isValid = false;
+                }
+                if (!passwordInput.value.trim()) {
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    submitBtn.classList.add('loading');
+                    submitBtn.disabled = true;
+
+                    signInWithEmailAndPassword(auth, usernameInput.value.trim(), passwordInput.value)
+                        .then((userCredential) => {
+                            handleAuthSuccess(userCredential.user);
+                        })
+                        .catch((error) => {
+                            handleAuthError(error);
+                        })
+                        .finally(() => {
+                            submitBtn.classList.remove('loading');
+                            submitBtn.disabled = false;
+                        });
+                }
+            });
+
+            // Social Sign-In Events
+            btnGoogle.addEventListener('click', () => {
+                const provider = new GoogleAuthProvider();
+                signInWithPopup(auth, provider)
+                    .then((result) => handleAuthSuccess(result.user))
+                    .catch((error) => handleAuthError(error));
+            });
+
+            btnFacebook.addEventListener('click', () => {
+                const provider = new FacebookAuthProvider();
+                signInWithPopup(auth, provider)
+                    .then((result) => handleAuthSuccess(result.user))
+                    .catch((error) => handleAuthError(error));
+            });
+
+            btnApple.addEventListener('click', () => {
+                const provider = new OAuthProvider('apple.com');
+                // Optional scopes depending on configuration
+                provider.addScope('email');
+                provider.addScope('name');
+                signInWithPopup(auth, provider)
+                    .then((result) => handleAuthSuccess(result.user))
+                    .catch((error) => handleAuthError(error));
+            });
+
+            // Forgot Password handling
+            forgotPassLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const email = usernameInput.value.trim();
+                if (!email || !email.includes('@')) {
+                    usernameError.style.display = 'block';
+                    usernameError.innerText = "Enter your email address above first to reset password.";
+                    return;
+                }
+                
+                sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        globalError.style.display = 'block';
+                        globalError.style.borderColor = 'var(--success-color)';
+                        globalError.style.color = 'var(--success-color)';
+                        globalError.style.background = 'rgba(16, 185, 129, 0.1)';
+                        globalError.innerText = "Password reset email sent! Check your inbox.";
+                    })
+                    .catch((error) => handleAuthError(error));
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2689 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Jerry Autos - Africa's trusted vehicle marketplace. Founded by Ajayi Jeremiah, we connect buyers and sellers securely, easily, and efficiently. Buy and sell vehicles with confidence.">
+    <meta name="keywords" content="Jerry Autos, vehicle marketplace, buy vehicles, sell vehicles, Ajayi Jeremiah, automotive marketplace, Africa, car sales, trusted vehicle platform">
+    <meta name="author" content="Jerry Autos">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="About Jerry Autos - Trusted Vehicle Marketplace">
+    <meta property="og:description" content="Driving trust, connecting buyers and sellers across Africa. Learn about our story, mission, and the visionary founder Ajayi Jeremiah.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jerryautos.com/about">
+    <meta property="og:image" content="https://jerryautos.com/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About Jerry Autos - Trusted Vehicle Marketplace">
+    <meta name="twitter:description" content="Driving trust, connecting buyers and sellers across Africa. Founded by Ajayi Jeremiah.">
+    <title>About Us | Jerry Autos - Trusted Vehicle Marketplace</title>
+
+    <style>
+        /* ============================================
+             CSS CUSTOM PROPERTIES & THEME SYSTEM
+             ============================================ */
+        :root {
+            --primary: #0F172A;
+            --primary-light: #1E293B;
+            --secondary: #2563EB;
+            --secondary-light: #3B82F6;
+            --secondary-dark: #1D4ED8;
+            --accent: #F59E0B;
+            --accent-light: #FBBF24;
+            --accent-dark: #D97706;
+            --white: #FFFFFF;
+            --gray-50: #F8FAFC;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-300: #CBD5E1;
+            --gray-400: #94A3B8;
+            --gray-500: #64748B;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1E293B;
+            --gray-900: #0F172A;
+            --success: #10B981;
+            --error: #EF4444;
+            --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-fast: 0.2s ease;
+            --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.08);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 30px rgba(37, 99, 235, 0.3);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --radius-full: 9999px;
+            --glass-bg: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-blur: blur(16px);
+            --max-width: 1200px;
+            --nav-height: 72px;
+        }
+
+        /* Dark Theme (Default) */
+        [data-theme="dark"] {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-card: #1A2332;
+            --bg-glass: rgba(255, 255, 255, 0.04);
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.06);
+            --input-border: rgba(255, 255, 255, 0.15);
+            --overlay-bg: rgba(15, 23, 42, 0.85);
+            --hero-overlay: rgba(15, 23, 42, 0.7);
+            --nav-bg: rgba(15, 23, 42, 0.85);
+            --footer-bg: #0B1320;
+            --stat-card-bg: rgba(37, 99, 235, 0.08);
+            --timeline-line: rgba(255, 255, 255, 0.2);
+            --badge-bg: rgba(37, 99, 235, 0.15);
+            --badge-text: #93C5FD;
+        }
+
+        /* Light Theme */
+        [data-theme="light"] {
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --text-primary: #0F172A;
+            --text-secondary: #334155;
+            --text-muted: #64748B;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: rgba(0, 0, 0, 0.15);
+            --overlay-bg: rgba(255, 255, 255, 0.9);
+            --hero-overlay: rgba(15, 23, 42, 0.55);
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --footer-bg: #0F172A;
+            --stat-card-bg: rgba(37, 99, 235, 0.05);
+            --timeline-line: rgba(0, 0, 0, 0.2);
+            --badge-bg: rgba(37, 99, 235, 0.08);
+            --badge-text: #1D4ED8;
+        }
+
+        /* ============================================
+             RESET & BASE STYLES
+             ============================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: var(--nav-height);
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: background-color var(--transition-smooth), color var(--transition-smooth);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        a:hover {
+            color: var(--secondary-light);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            line-height: 1.25;
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            letter-spacing: -0.02em;
+        }
+        h2 {
+            font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+            letter-spacing: -0.01em;
+        }
+        h3 {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .section {
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--secondary);
+            background: var(--badge-bg);
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-full);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto 3rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .highlight {
+            color: var(--secondary);
+            position: relative;
+        }
+        .highlight-accent {
+            color: var(--accent);
+        }
+
+        /* ============================================
+             GLASSMORPHISM UTILITY
+             ============================================ */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: all var(--transition-smooth);
+            box-shadow: var(--card-shadow);
+        }
+        .glass-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(37, 99, 235, 0.4);
+        }
+
+        /* ============================================
+             LOADING SCREEN
+             ============================================ */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            pointer-events: all;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loader-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+        .loader-logo span {
+            color: var(--accent);
+        }
+        .loader-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================
+             NAVIGATION
+             ============================================ */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: var(--nav-height);
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all var(--transition-smooth);
+            display: flex;
+            align-items: center;
+        }
+        .nav.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-logo .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--secondary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: 700;
+        }
+        .nav-logo span {
+            color: var(--accent);
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color var(--transition-fast);
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            border-radius: 2px;
+            transition: width var(--transition-smooth);
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text-primary);
+        }
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            border: none;
+            text-decoration: none;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+        .btn-primary {
+            background: var(--secondary);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+        }
+        .btn-primary:hover {
+            background: var(--secondary-dark);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+        }
+        .btn-outline:hover {
+            background: var(--secondary);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .btn-accent {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+        }
+        .btn-accent:hover {
+            background: var(--accent-dark);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+            transform: translateY(-2px);
+            color: #000;
+        }
+        .btn-lg {
+            padding: 0.85rem 2.2rem;
+            font-size: 1rem;
+        }
+        .theme-toggle-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--bg-card);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-smooth);
+            color: var(--text-primary);
+        }
+        .theme-toggle-btn:hover {
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-glow);
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+            z-index: 1001;
+        }
+        .hamburger span {
+            width: 26px;
+            height: 2.5px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all var(--transition-smooth);
+            display: block;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ============================================
+             HERO SECTION
+             ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: var(--nav-height);
+            background: linear-gradient(135deg, #0F172A 0%, #1A2744 30%, #0F1D3D 60%, #0F172A 100%);
+        }
+        [data-theme="light"] .hero {
+            background: linear-gradient(135deg, #E8EDF5 0%, #DCE4F0 30%, #E0E7F2 60%, #EDF1F7 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -30%;
+            width: 80%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+            animation: heroPulse 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -20%;
+            width: 60%;
+            height: 140%;
+            background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
+            animation: heroPulse 10s ease-in-out infinite 2s;
+            pointer-events: none;
+        }
+        @keyframes heroPulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.15);
+                opacity: 1;
+            }
+        }
+        .hero-grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 0.5rem 1.2rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 12px rgba(245, 158, 11, 0);
+            }
+        }
+        .hero h1 {
+            margin-bottom: 1.2rem;
+            line-height: 1.15;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 550px;
+        }
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .hero-visual {
+            position: absolute;
+            right: -5%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+            width: 55%;
+            max-width: 750px;
+            pointer-events: none;
+        }
+        .hero-car-silhouette {
+            width: 100%;
+            opacity: 0.15;
+            filter: brightness(1.5);
+        }
+        [data-theme="light"] .hero-car-silhouette {
+            opacity: 0.08;
+            filter: brightness(0.3);
+        }
+
+        /* ============================================
+             ABOUT SECTION
+             ============================================ */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .about-image-wrapper {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, var(--secondary-dark), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .about-image-placeholder {
+            font-size: 6rem;
+            opacity: 0.4;
+            color: #fff;
+        }
+        .about-image-badge {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.5rem;
+            color: #fff;
+            text-align: center;
+            font-weight: 700;
+        }
+        .about-image-badge .number {
+            font-size: 2rem;
+            color: var(--accent);
+            display: block;
+            line-height: 1;
+        }
+        .about-text .section-label {
+            margin-bottom: 0.75rem;
+        }
+        .about-text h2 {
+            margin-bottom: 1.2rem;
+        }
+        .about-text p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        .about-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        .about-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+        .about-feature-item .check-icon {
+            width: 22px;
+            height: 22px;
+            background: rgba(16, 185, 129, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--success);
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        /* ============================================
+             FOUNDER SECTION
+             ============================================ */
+        .founder-section {
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        .founder-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        .founder-image-card {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            aspect-ratio: 3/4;
+            max-width: 380px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, var(--secondary-dark) 0%, var(--primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--border-color);
+            box-shadow: var(--shadow-xl);
+        }
+        .founder-initials {
+            font-size: 6rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: -0.03em;
+        }
+        .founder-image-badge {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-full);
+            padding: 0.5rem 1.2rem;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        .founder-info h2 {
+            margin-bottom: 0.25rem;
+        }
+        .founder-role {
+            color: var(--secondary);
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            font-size: 1rem;
+        }
+        .founder-story {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+        .founder-quote {
+            border-left: 3px solid var(--accent);
+            padding-left: 1.2rem;
+            font-style: italic;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            margin: 1.5rem 0;
+        }
+        .founder-social {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.2rem;
+        }
+        .founder-social a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-smooth);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .founder-social a:hover {
+            background: var(--secondary);
+            color: #fff;
+            border-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        /* ============================================
+             MISSION & VISION CARDS
+             ============================================ */
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        .mission-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .mission-card .icon-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 1.5rem;
+            transition: all var(--transition-smooth);
+        }
+        .mission-card:hover .icon-circle {
+            background: var(--secondary);
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow);
+        }
+        .mission-card h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+        .mission-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .vision-banner {
+            background: linear-gradient(135deg, var(--secondary-dark), var(--primary));
+            border-radius: var(--radius-xl);
+            padding: 3rem 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .vision-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(245, 158, 11, 0.2) 0%, transparent 60%);
+        }
+        .vision-banner h3 {
+            color: #fff;
+            position: relative;
+            z-index: 1;
+            font-size: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        .vision-banner .vision-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================
+             TIMELINE / JOURNEY
+             ============================================ */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--timeline-line);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2.5rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        .timeline-item.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+            text-align: right;
+            padding-right: calc(50% + 2.5rem);
+        }
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+            text-align: left;
+            padding-left: calc(50% + 2.5rem);
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 0.5rem;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 18px;
+            background: var(--secondary);
+            border-radius: 50%;
+            border: 4px solid var(--bg-primary);
+            z-index: 2;
+            box-shadow: 0 0 0 4px var(--border-color);
+            transition: all var(--transition-smooth);
+        }
+        .timeline-item:hover .timeline-dot {
+            box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.3);
+            background: var(--accent);
+        }
+        .timeline-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition-smooth);
+        }
+        .timeline-item:hover .timeline-content {
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-lg);
+        }
+        .timeline-year {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+        .timeline-content h4 {
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+        }
+        .timeline-content p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ============================================
+             CORE VALUES
+             ============================================ */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .value-card {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            position: relative;
+        }
+        .value-card .value-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            transition: transform var(--transition-bounce);
+        }
+        .value-card:hover .value-icon {
+            transform: scale(1.2) rotate(-5deg);
+        }
+        .value-card h4 {
+            margin-bottom: 0.5rem;
+        }
+        .value-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ============================================
+             WHY CHOOSE US
+             ============================================ */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .feature-card {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1.8rem;
+        }
+        .feature-card .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            background: rgba(37, 99, 235, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            transition: all var(--transition-smooth);
+        }
+        .feature-card:hover .feature-icon {
+            background: var(--secondary);
+            box-shadow: var(--shadow-glow);
+            transform: scale(1.05);
+        }
+        .feature-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ============================================
+             STATISTICS
+             ============================================ */
+        .stats-section {
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.5rem;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: var(--stat-card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-smooth);
+        }
+        .stat-card:hover {
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* ============================================
+             TEAM SECTION
+             ============================================ */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        .team-card {
+            text-align: center;
+            padding: 2rem 1.2rem;
+        }
+        .team-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-dark), var(--primary-light));
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            border: 3px solid var(--border-color);
+            transition: all var(--transition-smooth);
+        }
+        .team-card:hover .team-avatar {
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-glow);
+            transform: scale(1.05);
+        }
+        .team-card h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.2rem;
+        }
+        .team-role {
+            color: var(--secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        .team-social {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .team-social a {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all var(--transition-smooth);
+        }
+        .team-social a:hover {
+            background: var(--secondary);
+            color: #fff;
+            border-color: var(--secondary);
+        }
+
+        /* ============================================
+             TESTIMONIALS
+             ============================================ */
+        .testimonials-wrapper {
+            position: relative;
+            max-width: 750px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .testimonials-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 1rem;
+        }
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+        .testimonial-stars {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        .testimonial-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        .testimonial-author {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .testimonial-role {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary-dark);
+            margin: 0 auto 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        .testimonial-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .testimonial-nav button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all var(--transition-smooth);
+        }
+        .testimonial-nav button:hover {
+            background: var(--secondary);
+            color: #fff;
+            border-color: var(--secondary);
+        }
+        .testimonial-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .testimonial-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+        }
+        .testimonial-dot.active {
+            background: var(--secondary);
+            width: 28px;
+            border-radius: 20px;
+        }
+
+        /* ============================================
+             CONTACT SECTION
+             ============================================ */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 3rem;
+        }
+        .contact-info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .contact-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .contact-info-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            background: rgba(37, 99, 235, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .contact-info-item h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.15rem;
+        }
+        .contact-info-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .map-placeholder {
+            width: 100%;
+            height: 250px;
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 1.5rem;
+        }
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            transition: all var(--transition-fast);
+            outline: none;
+            resize: vertical;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .form-group textarea {
+            min-height: 120px;
+        }
+
+        /* ============================================
+             NEWSLETTER
+             ============================================ */
+        .newsletter-section {
+            background: linear-gradient(135deg, var(--secondary-dark), var(--primary));
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-xl);
+            margin: 3rem auto;
+            max-width: var(--max-width);
+            padding: 3.5rem 2rem;
+            text-align: center;
+        }
+        .newsletter-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(245, 158, 11, 0.25) 0%, transparent 60%);
+        }
+        .newsletter-content {
+            position: relative;
+            z-index: 1;
+        }
+        .newsletter-content h2 {
+            color: #fff;
+            margin-bottom: 0.75rem;
+        }
+        .newsletter-content p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+        }
+        .newsletter-form {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 500px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .newsletter-form input {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.85rem 1.2rem;
+            border-radius: var(--radius-full);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+        .newsletter-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .newsletter-form input:focus {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .newsletter-form .btn {
+            border-radius: var(--radius-full);
+        }
+
+        /* ============================================
+             FOOTER
+             ============================================ */
+        .footer {
+            background: var(--footer-bg);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 4rem 0 1.5rem;
+        }
+        [data-theme="light"] .footer {
+            color: rgba(255, 255, 255, 0.85);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .footer-col h4 {
+            color: #fff;
+            margin-bottom: 1.2rem;
+            font-size: 1.05rem;
+        }
+        .footer-col p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            transition: color var(--transition-fast);
+        }
+        .footer-links a:hover {
+            color: var(--accent-light);
+        }
+        .footer-social {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .footer-social a {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all var(--transition-smooth);
+            font-size: 0.85rem;
+        }
+        .footer-social a:hover {
+            background: var(--secondary);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+        .footer-bottom a {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .footer-bottom a:hover {
+            color: var(--accent-light);
+        }
+
+        /* ============================================
+             BACK TO TOP BUTTON
+             ============================================ */
+        #back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        #back-to-top:hover {
+            background: var(--secondary-dark);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+            transform: translateY(-4px);
+        }
+
+        /* ============================================
+             SCROLL REVEAL
+             ============================================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-delay-1 {
+            transition-delay: 0.1s;
+        }
+        .reveal-delay-2 {
+            transition-delay: 0.2s;
+        }
+        .reveal-delay-3 {
+            transition-delay: 0.3s;
+        }
+        .reveal-delay-4 {
+            transition-delay: 0.4s;
+        }
+
+        /* ============================================
+             RESPONSIVE MEDIA QUERIES
+             ============================================ */
+        @media (max-width: 1024px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .founder-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .founder-image-card {
+                max-width: 280px;
+                aspect-ratio: 1/1;
+            }
+            .founder-quote {
+                text-align: left;
+            }
+            .founder-social {
+                justify-content: center;
+            }
+            .mission-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .values-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item:nth-child(odd),
+            .timeline-item:nth-child(even) {
+                flex-direction: row;
+                text-align: left;
+                padding-left: 50px;
+                padding-right: 0;
+            }
+            .timeline-dot {
+                left: 20px;
+            }
+            .hero-visual {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: var(--bg-primary);
+                flex-direction: column;
+                padding: 6rem 2rem 2rem;
+                gap: 1.5rem;
+                transition: right var(--transition-smooth);
+                box-shadow: var(--shadow-xl);
+                z-index: 999;
+                border-left: 1px solid var(--border-color);
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .nav-actions .btn {
+                display: none;
+            }
+            .nav-actions .btn.theme-toggle-btn {
+                display: flex;
+            }
+            .mission-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .team-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .hero-buttons {
+                flex-direction: column;
+            }
+            .hero-buttons .btn {
+                width: 100%;
+            }
+            .about-features {
+                grid-template-columns: 1fr;
+            }
+            .newsletter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .newsletter-form input {
+                min-width: auto;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section {
+                padding: 3rem 0;
+            }
+            .mission-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            .stat-number {
+                font-size: 2rem;
+            }
+            .testimonial-card {
+                padding: 1.5rem;
+            }
+            .glass-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Mobile menu overlay */
+        .mobile-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-smooth);
+        }
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+    LOADING SCREEN
+    ============================================ -->
+    <div id="loading-screen" aria-hidden="true">
+        <div class="loader-logo">Jerry<span>Autos</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <!-- ============================================
+    MOBILE OVERLAY
+    ============================================ -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- ============================================
+    STICKY NAVIGATION
+    ============================================ -->
+    <nav class="nav" id="navbar" role="navigation" aria-label="Main navigation">
+        <div class="container">
+            <a href="#" class="nav-logo" aria-label="Jerry Autos Home">
+                <div class="logo-icon">JA</div>
+                Jerry<span>Autos</span>
+            </a>
+            <ul class="nav-links" id="nav-links" role="menubar">
+                <li role="none"><a href="#about" role="menuitem" class="active">About</a></li>
+                <li role="none"><a href="#founder" role="menuitem">Founder</a></li>
+                <li role="none"><a href="#mission" role="menuitem">Mission</a></li>
+                <li role="none"><a href="#journey" role="menuitem">Journey</a></li>
+                <li role="none"><a href="#values" role="menuitem">Values</a></li>
+                <li role="none"><a href="#team" role="menuitem">Team</a></li>
+                <li role="none"><a href="#contact" role="menuitem">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+                    🌙
+                </button>
+                <a href="#contact" class="btn btn-primary">Get In Touch</a>
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="hero" id="hero" aria-labelledby="hero-headline">
+        <div class="hero-grid-overlay"></div>
+        <div class="container">
+            <div class="hero-content reveal">
+                <div class="hero-badge">
+                    <span class="dot"></span> Africa's Trusted Vehicle Marketplace
+                </div>
+                <h1 id="hero-headline">Driving Trust,<br>Connecting <span class="highlight">Buyers</span> and <span class="highlight-accent">Sellers</span></h1>
+                <p>Jerry Autos is a trusted vehicle marketplace helping people buy and sell vehicles easily, securely, and efficiently across Africa.</p>
+                <div class="hero-buttons">
+                    <a href="#about" class="btn btn-primary btn-lg">Explore Vehicles</a>
+                    <a href="#contact" class="btn btn-outline btn-lg">Contact Us</a>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+            <svg class="hero-car-silhouette" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 280 L100 180 L250 140 L400 120 L550 140 L700 180 L750 280 L720 280 L680 220 L600 200 L400 185 L200 200 L120 220 L80 280 Z" fill="currentColor" opacity="0.6"/>
+                <circle cx="220" cy="290" r="45" fill="currentColor" opacity="0.5"/>
+                <circle cx="580" cy="290" r="45" fill="currentColor" opacity="0.5"/>
+                <rect x="300" y="190" width="200" height="60" rx="30" fill="currentColor" opacity="0.3"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ============================================
+    ABOUT JERRY AUTOS
+    ============================================ -->
+    <section class="section" id="about" aria-labelledby="about-title">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image-wrapper reveal" aria-hidden="true">
+                    <div class="about-image-placeholder">🚗</div>
+                    <div class="about-image-badge">
+                        <span class="number">2021</span>Established
+                    </div>
+                </div>
+                <div class="about-text reveal reveal-delay-1">
+                    <span class="section-label">About Jerry Autos</span>
+                    <h2 id="about-title">Redefining Vehicle <span class="highlight">Commerce</span> in Africa</h2>
+                    <p>Jerry Autos is more than just a marketplace — we are a movement dedicated to transforming how vehicles are bought and sold across Africa. Founded with a bold vision, we combine cutting-edge technology with deep automotive expertise to create a platform that prioritizes <strong>trust, security, and convenience</strong>.</p>
+                    <p>Our platform serves as a bridge between honest sellers and serious buyers. Every vehicle listing undergoes a rigorous verification process, ensuring that what you see is exactly what you get. We've built robust tools that make searching, comparing, and transacting seamless — whether you're a first-time buyer or a seasoned dealer.</p>
+                    <p>At Jerry Autos, innovation drives everything we do. From AI-powered vehicle recommendations to secure in-app payment solutions, we continuously evolve to meet the needs of our growing community. Our commitment is simple: <strong>to make vehicle commerce safe, transparent, and accessible for everyone.</strong></p>
+                    <div class="about-features">
+                        <div class="about-feature-item"><span class="check-icon">✓</span> Verified Listings</div>
+                        <div class="about-feature-item"><span class="check-icon">✓</span> Secure Transactions</div>
+                        <div class="about-feature-item"><span class="check-icon">✓</span> 24/7 Support</div>
+                        <div class="about-feature-item"><span class="check-icon">✓</span> Nationwide Coverage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOUNDER SECTION
+    ============================================ -->
+    <section class="section founder-section" id="founder" aria-labelledby="founder-title">
+        <div class="container">
+            <div class="founder-grid">
+                <div class="founder-image-card reveal" aria-hidden="true">
+                    <div class="founder-initials">AJ</div>
+                    <div class="founder-image-badge">🚀 Founder & CEO</div>
+                </div>
+                <div class="founder-info reveal reveal-delay-1">
+                    <span class="section-label">Meet the Founder</span>
+                    <h2 id="founder-title">Ajayi <span class="highlight">Jeremiah</span></h2>
+                    <p class="founder-role">Founder & Chief Executive Officer</p>
+                    <p class="founder-story">
+                        Ajayi Jeremiah's journey began with a deep-rooted passion for automobiles and a fascination with technology's power to solve real-world problems. Growing up, he witnessed firsthand the challenges people faced when trying to buy or sell vehicles — opaque pricing, fraudulent listings, and a lack of trust between parties. These experiences ignited a fire within him to build something better.
+                    </p>
+                    <p class="founder-story">
+                        With a background spanning software engineering, product design, and automotive industry insights, Jeremiah assembled a world-class team and poured his energy into creating Jerry Autos. His leadership philosophy centers on <strong>radical transparency, customer obsession, and continuous innovation</strong>. Under his guidance, the company has grown from a simple idea into one of Africa's most promising vehicle marketplace platforms.
+                    </p>
+                    <blockquote class="founder-quote">
+                        "I believe that everyone deserves a safe, fair, and seamless experience when buying or selling a vehicle. Jerry Autos was born from that belief — and every feature we build reflects our unwavering commitment to our users."
+                    </blockquote>
+                    <div class="founder-social">
+                        <a href="#" aria-label="LinkedIn" title="LinkedIn">in</a>
+                        <a href="#" aria-label="Twitter" title="Twitter">𝕏</a>
+                        <a href="#" aria-label="Instagram" title="Instagram">📷</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    MISSION SECTION
+    ============================================ -->
+    <section class="section" id="mission" aria-labelledby="mission-title">
+        <div class="container text-center">
+            <span class="section-label">Our Mission</span>
+            <h2 id="mission-title" class="section-title">What <span class="highlight">Drives</span> Us Every Day</h2>
+            <p class="section-subtitle">Four core pillars guide everything we do at Jerry Autos.</p>
+            <div class="mission-grid">
+                <div class="glass-card mission-card reveal">
+                    <div class="icon-circle">🤝</div>
+                    <h4>Connect Seamlessly</h4>
+                    <p>Bridge the gap between buyers and sellers with an intuitive, frictionless platform.</p>
+                </div>
+                <div class="glass-card mission-card reveal reveal-delay-1">
+                    <div class="icon-circle">🔒</div>
+                    <h4>Secure Marketplace</h4>
+                    <p>Every transaction is protected with industry-leading security measures and verification.</p>
+                </div>
+                <div class="glass-card mission-card reveal reveal-delay-2">
+                    <div class="icon-circle">⭐</div>
+                    <h4>Exceptional Experience</h4>
+                    <p>Deliver world-class customer service and a delightful user journey from start to finish.</p>
+                </div>
+                <div class="glass-card mission-card reveal reveal-delay-3">
+                    <div class="icon-circle">🛡️</div>
+                    <h4>Trust & Transparency</h4>
+                    <p>Build lasting relationships through honest listings, clear pricing, and open communication.</p>
+                </div>
+            </div>
+            <!-- Vision Banner -->
+            <div class="vision-banner reveal">
+                <div class="vision-icon">🔭</div>
+                <h3>"Our vision is to become Africa's leading digital automobile marketplace where buying and selling vehicles is simple, secure, and accessible to everyone."</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    COMPANY JOURNEY / TIMELINE
+    ============================================ -->
+    <section class="section" id="journey" aria-labelledby="journey-title" style="background: var(--bg-secondary);">
+        <div class="container text-center">
+            <span class="section-label">Our Journey</span>
+            <h2 id="journey-title" class="section-title">From <span class="highlight">Idea</span> to Impact</h2>
+            <p class="section-subtitle">The milestones that shaped Jerry Autos into what it is today.</p>
+            <div class="timeline">
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">Early 2021</span>
+                        <h4>💡 Company Idea</h4>
+                        <p>Ajayi Jeremiah identifies the need for a trusted vehicle marketplace in Africa and begins market research.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">Mid 2021</span>
+                        <h4>🛠️ Platform Development</h4>
+                        <p>The engineering team begins building the core platform with modern, scalable technology.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">Late 2021</span>
+                        <h4>🚗 First Vehicle Listing</h4>
+                        <p>Jerry Autos goes live with its first verified vehicle listing, marking the official launch.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">2023</span>
+                        <h4>📈 Customer Growth</h4>
+                        <p>Rapid user adoption with thousands of active buyers and sellers joining the platform monthly.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">2024</span>
+                        <h4>🌍 Marketplace Expansion</h4>
+                        <p>Expansion into multiple African markets with localized support and regional partnerships.</p>
+                    </div>
+                </div>
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-year">2026 & Beyond</span>
+                        <h4>🚀 Future Innovation</h4>
+                        <p>Pioneering AI-driven vehicle insights, blockchain-verified histories, and continent-wide reach.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CORE VALUES
+    ============================================ -->
+    <section class="section" id="values" aria-labelledby="values-title">
+        <div class="container text-center">
+            <span class="section-label">Core Values</span>
+            <h2 id="values-title" class="section-title">The Principles That <span class="highlight">Define</span> Us</h2>
+            <p class="section-subtitle">These values are embedded in every decision we make and every feature we build.</p>
+            <div class="values-grid">
+                <div class="glass-card value-card reveal">
+                    <span class="value-icon">🤝</span>
+                    <h4>Integrity</h4>
+                    <p>We do the right thing, always — even when no one is watching.</p>
+                </div>
+                <div class="glass-card value-card reveal reveal-delay-1">
+                    <span class="value-icon">🛡️</span>
+                    <h4>Trust</h4>
+                    <p>Building confidence through verified listings and transparent processes.</p>
+                </div>
+                <div class="glass-card value-card reveal reveal-delay-2">
+                    <span class="value-icon">💡</span>
+                    <h4>Innovation</h4>
+                    <p>Continuously pushing boundaries with cutting-edge automotive technology.</p>
+                </div>
+                <div class="glass-card value-card reveal">
+                    <span class="value-icon">🏆</span>
+                    <h4>Excellence</h4>
+                    <p>Relentlessly pursuing the highest standards in everything we deliver.</p>
+                </div>
+                <div class="glass-card value-card reveal reveal-delay-1">
+                    <span class="value-icon">🔍</span>
+                    <h4>Transparency</h4>
+                    <p>Open communication, clear pricing, and honest vehicle histories.</p>
+                </div>
+                <div class="glass-card value-card reveal reveal-delay-2">
+                    <span class="value-icon">😊</span>
+                    <h4>Customer Satisfaction</h4>
+                    <p>Our users' success is our success — we go above and beyond to ensure it.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    WHY CHOOSE JERRY AUTOS
+    ============================================ -->
+    <section class="section" id="why-us" aria-labelledby="why-us-title" style="background: var(--bg-secondary);">
+        <div class="container text-center">
+            <span class="section-label">Why Choose Us</span>
+            <h2 id="why-us-title" class="section-title">The <span class="highlight">Jerry Autos</span> Advantage</h2>
+            <p class="section-subtitle">We offer more than just listings — we offer peace of mind.</p>
+            <div class="features-grid">
+                <div class="glass-card feature-card reveal">
+                    <div class="feature-icon">✅</div>
+                    <div>
+                        <h4>Verified Vehicle Listings</h4>
+                        <p>Every vehicle is inspected and verified before being listed on our platform.</p>
+                    </div>
+                </div>
+                <div class="glass-card feature-card reveal reveal-delay-1">
+                    <div class="feature-icon">🔐</div>
+                    <div>
+                        <h4>Secure Transactions</h4>
+                        <p>End-to-end encrypted payments and secure escrow services for total peace of mind.</p>
+                    </div>
+                </div>
+                <div class="glass-card feature-card reveal reveal-delay-2">
+                    <div class="feature-icon">🔎</div>
+                    <div>
+                        <h4>Easy Vehicle Search</h4>
+                        <p>Powerful filters and AI recommendations to find your perfect vehicle instantly.</p>
+                    </div>
+                </div>
+                <div class="glass-card feature-card reveal">
+                    <div class="feature-icon">📞</div>
+                    <div>
+                        <h4>Responsive Customer Support</h4>
+                        <p>24/7 dedicated support team ready to assist you at every step of the journey.</p>
+                    </div>
+                </div>
+                <div class="glass-card feature-card reveal reveal-delay-1">
+                    <div class="feature-icon">🏅</div>
+                    <div>
+                        <h4>Trusted Marketplace</h4>
+                        <p>Thousands of successful transactions and a growing community of happy users.</p>
+                    </div>
+                </div>
+                <div class="glass-card feature-card reveal reveal-delay-2">
+                    <div class="feature-icon">⚡</div>
+                    <div>
+                        <h4>Modern Technology</h4>
+                        <p>Fast, responsive platform built with the latest technology for a seamless experience.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    STATISTICS SECTION
+    ============================================ -->
+    <section class="section stats-section" id="stats" aria-labelledby="stats-title">
+        <div class="container text-center">
+            <span class="section-label">By the Numbers</span>
+            <h2 id="stats-title" class="section-title">Our <span class="highlight">Impact</span> in Figures</h2>
+            <p class="section-subtitle">Real numbers that reflect our growing community and trusted platform.</p>
+            <div class="stats-grid">
+                <div class="stat-card reveal">
+                    <div class="stat-number" data-target="12500" data-suffix="+">0</div>
+                    <div class="stat-label">Vehicles Listed</div>
+                </div>
+                <div class="stat-card reveal reveal-delay-1">
+                    <div class="stat-number" data-target="48000" data-suffix="+">0</div>
+                    <div class="stat-label">Active Buyers</div>
+                </div>
+                <div class="stat-card reveal reveal-delay-2">
+                    <div class="stat-number" data-target="8200" data-suffix="+">0</div>
+                    <div class="stat-label">Active Sellers</div>
+                </div>
+                <div class="stat-card reveal reveal-delay-3">
+                    <div class="stat-number" data-target="6300" data-suffix="+">0</div>
+                    <div class="stat-label">Successful Transactions</div>
+                </div>
+                <div class="stat-card reveal reveal-delay-4">
+                    <div class="stat-number" data-target="98" data-suffix="%">0</div>
+                    <div class="stat-label">Customer Satisfaction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    TEAM SECTION
+    ============================================ -->
+    <section class="section" id="team" aria-labelledby="team-title">
+        <div class="container text-center">
+            <span class="section-label">Our Team</span>
+            <h2 id="team-title" class="section-title">Meet the <span class="highlight">People</span> Behind Jerry Autos</h2>
+            <p class="section-subtitle">A passionate team dedicated to revolutionizing vehicle commerce in Africa.</p>
+            <div class="team-grid">
+                <div class="glass-card team-card reveal">
+                    <div class="team-avatar">AJ</div>
+                    <h4>Ajayi Jeremiah</h4>
+                    <p class="team-role">Founder & CEO</p>
+                    <div class="team-social">
+                        <a href="#" aria-label="LinkedIn">in</a>
+                        <a href="#" aria-label="Twitter">𝕏</a>
+                    </div>
+                </div>
+                <div class="glass-card team-card reveal reveal-delay-1">
+                    <div class="team-avatar">AF</div>
+                    <h4>Adegoke faruq</h4>
+                    <p class="team-role">Chief Technology Officer</p>
+                    <div class="team-social">
+                        <a href="#" aria-label="LinkedIn">in</a>
+                        <a href="#" aria-label="Twitter">𝕏</a>
+                    </div>
+                </div>
+                <div class="glass-card team-card reveal reveal-delay-2">
+                    <div class="team-avatar">OM</div>
+                    <h4>Owolabi Malik</h4>
+                    <p class="team-role">Head of Operations</p>
+                    <div class="team-social">
+                        <a href="#" aria-label="LinkedIn">in</a>
+                        <a href="#" aria-label="Twitter">𝕏</a>
+                    </div>
+                </div>
+                <div class="glass-card team-card reveal reveal-delay-3">
+                    <div class="team-avatar">OF</div>
+                    <h4>Obaoluwa F.</h4>
+                    <p class="team-role">Head of Marketing</p>
+                    <div class="team-social">
+                        <a href="#" aria-label="LinkedIn">in</a>
+                        <a href="#" aria-label="Twitter">𝕏</a>
+                    </div>
+                </div>
+                  <div class="glass-card team-card reveal reveal-delay-3">
+                    <div class="team-avatar">AZ</div>
+                    <h4>Akinyemi Zion</h4>
+                    <p class="team-role">Head of Director</p>
+                    <div class="team-social">
+                        <a href="#" aria-label="LinkedIn">in</a>
+                        <a href="#" aria-label="Twitter">𝕏</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    TESTIMONIALS SECTION
+    ============================================ -->
+    <section class="section" id="testimonials" aria-labelledby="testimonials-title" style="background: var(--bg-secondary);">
+        <div class="container text-center">
+            <span class="section-label">Testimonials</span>
+            <h2 id="testimonials-title" class="section-title">What Our <span class="highlight">Customers</span> Say</h2>
+            <p class="section-subtitle">Real stories from real people who found their perfect vehicle on Jerry Autos.</p>
+            <div class="testimonials-wrapper reveal">
+                <div class="testimonials-track" id="testimonials-track">
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar">EO</div>
+                            <div class="testimonial-stars">★★★★★</div>
+                            <p class="testimonial-text">"I was skeptical about buying a car online, but Jerry Autos made the process so smooth and transparent. The verified listing gave me complete confidence. I found my dream SUV in just three days!"</p>
+                            <p class="testimonial-author">Emeka Okafor</p>
+                            <p class="testimonial-role">Verified Buyer • Lagos</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar">FA</div>
+                            <div class="testimonial-stars">★★★★★</div>
+                            <p class="testimonial-text">"As a seller, I appreciated how quickly my vehicle was listed and how many serious inquiries I received. The secure transaction system protected both me and the buyer. Highly recommended!"</p>
+                            <p class="testimonial-author">Fatima Adeyemi</p>
+                            <p class="testimonial-role">Verified Seller • Abuja</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar">KN</div>
+                            <div class="testimonial-stars">★★★★★</div>
+                            <p class="testimonial-text">"The customer support team at Jerry Autos is incredible. They guided me through every step and even helped with the paperwork. This is the future of vehicle commerce in Africa!"</p>
+                            <p class="testimonial-author">Kwame Nkrumah</p>
+                            <p class="testimonial-role">Verified Buyer • Accra</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-nav">
+                    <button id="testimonial-prev" aria-label="Previous testimonial">←</button>
+                    <button id="testimonial-next" aria-label="Next testimonial">→</button>
+                </div>
+                <div class="testimonial-dots" id="testimonial-dots">
+                    <span class="testimonial-dot active" data-index="0"></span>
+                    <span class="testimonial-dot" data-index="1"></span>
+                    <span class="testimonial-dot" data-index="2"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CONTACT SECTION
+    ============================================ -->
+    <section class="section" id="contact" aria-labelledby="contact-title">
+        <div class="container">
+            <div class="text-center">
+                <span class="section-label">Get In Touch</span>
+                <h2 id="contact-title" class="section-title">We'd Love to <span class="highlight">Hear</span> From You</h2>
+                <p class="section-subtitle">Have questions, feedback, or need assistance? Reach out to us anytime.</p>
+            </div>
+            <div class="contact-grid">
+                <div class="reveal">
+                    <h3>Contact Information</h3>
+                    <ul class="contact-info-list">
+                        <li class="contact-info-item">
+                            <div class="contact-info-icon">📧</div>
+                            <div>
+                                <h4>Email Address</h4>
+                                <p>hello@jerryautos.com</p>
+                                <p>support@jerryautos.com</p>
+                            </div>
+                        </li>
+                        <li class="contact-info-item">
+                            <div class="contact-info-icon">📞</div>
+                            <div>
+                                <h4>Phone Number</h4>
+                                <p>+234 912 259 6449</p>
+                                <p>+234 708 540 1048</p>
+                            </div>
+                        </li>
+                        <li class="contact-info-item">
+                            <div class="contact-info-icon">📍</div>
+                            <div>
+                                <h4>Office Address</h4>
+                                <p>123 Automotive Avenue, Victoria Island, Lagos, Nigeria</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="map-placeholder">
+                        🗺️ Google Maps — Lagos, Nigeria
+                    </div>
+                </div>
+                <div class="reveal reveal-delay-1">
+                    <form class="contact-form glass-card" id="contact-form" novalidate>
+                        <h3>Send Us a Message</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first-name">First Name *</label>
+                                <input type="text" id="first-name" placeholder="Your first name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Last Name *</label>
+                                <input type="text" id="last-name" placeholder="Your last name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email Address *</label>
+                            <input type="email" id="contact-email" placeholder="you@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <select id="subject">
+                                <option value="">Select a topic</option>
+                                <option value="inquiry">General Inquiry</option>
+                                <option value="support">Customer Support</option>
+                                <option value="partnership">Partnership</option>
+                                <option value="feedback">Feedback</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" placeholder="How can we help you?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg">Send Message ✉️</button>
+                        <p id="form-feedback" style="margin-top:0.5rem;font-weight:600;display:none;"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    NEWSLETTER SECTION
+    ============================================ -->
+    <div class="container">
+        <div class="newsletter-section reveal">
+            <div class="newsletter-content">
+                <h2>🚀 Stay in the Driver's Seat</h2>
+                <p>Subscribe to our newsletter for the latest vehicle listings, automotive tips, and exclusive deals delivered straight to your inbox.</p>
+                <form class="newsletter-form" id="newsletter-form" novalidate>
+                    <input type="email" placeholder="Enter your email address" required aria-label="Email for newsletter">
+                    <button type="submit" class="btn btn-accent btn-lg">Subscribe Now</button>
+                </form>
+                <p id="newsletter-feedback" style="color:#fff;margin-top:0.75rem;font-weight:600;display:none;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>🏎️ Jerry Autos</h4>
+                    <p>Africa's trusted vehicle marketplace. Connecting buyers and sellers with confidence, security, and ease since 2021.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook">f</a>
+                        <a href="#" aria-label="Twitter">𝕏</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="LinkedIn">in</a>
+                        <a href="#" aria-label="YouTube">▶</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#founder">Founder</a></li>
+                        <li><a href="#mission">Mission & Vision</a></li>
+                        <li><a href="#journey">Our Journey</a></li>
+                        <li><a href="#team">Team</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Browse Vehicles</a></li>
+                        <li><a href="#">Sell Your Vehicle</a></li>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <p>📧 hello@jerryautos.com</p>
+                    <p>📞 +234 800 000 0000</p>
+                    <p>📍 Victoria Island, Lagos, Nigeria</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Jerry Autos. All Rights Reserved.</p>
+                <p>
+                    <a href="#">Privacy Policy</a> &nbsp;•&nbsp;
+                    <a href="#">Terms & Conditions</a> &nbsp;•&nbsp;
+                    <a href="#">Cookie Policy</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================
+    BACK TO TOP BUTTON
+    ============================================ -->
+    <button id="back-to-top" aria-label="Back to top" title="Back to top">↑</button>
+
+    <!-- ============================================
+    JAVASCRIPT
+    ============================================ -->
+    <script>
+        (function() {
+            // ============================================
+            // DOM ELEMENT REFERENCES
+            // ============================================
+            const loadingScreen = document.getElementById('loading-screen');
+            const navbar = document.getElementById('navbar');
+            const navLinks = document.getElementById('nav-links');
+            const hamburger = document.getElementById('hamburger');
+            const mobileOverlay = document.getElementById('mobile-overlay');
+            const themeToggle = document.getElementById('theme-toggle');
+            const backToTopBtn = document.getElementById('back-to-top');
+            const htmlElement = document.documentElement;
+            const contactForm = document.getElementById('contact-form');
+            const formFeedback = document.getElementById('form-feedback');
+            const newsletterForm = document.getElementById('newsletter-form');
+            const newsletterFeedback = document.getElementById('newsletter-feedback');
+            const testimonialsTrack = document.getElementById('testimonials-track');
+            const testimonialPrev = document.getElementById('testimonial-prev');
+            const testimonialNext = document.getElementById('testimonial-next');
+            const testimonialDots = document.querySelectorAll('.testimonial-dot');
+            const statNumbers = document.querySelectorAll('.stat-number');
+            const revealElements = document.querySelectorAll('.reveal');
+            const timelineItems = document.querySelectorAll('.timeline-item');
+
+            let currentTestimonial = 0;
+            const totalTestimonials = 3;
+            let testimonialInterval;
+            let statsAnimated = false;
+
+            // ============================================
+            // LOADING SCREEN
+            // ============================================
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    // Remove from DOM after transition
+                    setTimeout(() => {
+                        if (loadingScreen.parentNode) {
+                            loadingScreen.parentNode.removeChild(loadingScreen);
+                        }
+                    }, 500);
+                }, 800);
+            });
+
+            // ============================================
+            // THEME TOGGLE (DARK / LIGHT MODE)
+            // ============================================
+            const savedTheme = localStorage.getItem('jerry-autos-theme') || 'dark';
+            htmlElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                htmlElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('jerry-autos-theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+
+            function updateThemeIcon(theme) {
+                themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+
+            // ============================================
+            // MOBILE HAMBURGER MENU
+            // ============================================
+            hamburger.addEventListener('click', () => {
+                const isActive = navLinks.classList.contains('active');
+                if (isActive) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            });
+
+            mobileOverlay.addEventListener('click', closeMenu);
+
+            // Close menu when a nav link is clicked
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (navLinks.classList.contains('active')) {
+                        closeMenu();
+                    }
+                });
+            });
+
+            function openMenu() {
+                navLinks.classList.add('active');
+                hamburger.classList.add('active');
+                mobileOverlay.classList.add('active');
+                hamburger.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMenu() {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+
+            // ============================================
+            // STICKY NAVIGATION SCROLL EFFECT
+            // ============================================
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+                // Back to top button
+                if (scrollY > 500) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+                // Update active nav link based on scroll position
+                updateActiveNavLink();
+            });
+
+            // ============================================
+            // UPDATE ACTIVE NAV LINK ON SCROLL
+            // ============================================
+            function updateActiveNavLink() {
+                const sections = document.querySelectorAll('section[id]');
+                const navAnchors = navLinks.querySelectorAll('a');
+                let currentSection = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.offsetHeight;
+                    if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+                navAnchors.forEach(anchor => {
+                    anchor.classList.remove('active');
+                    if (anchor.getAttribute('href') === '#' + currentSection) {
+                        anchor.classList.add('active');
+                    }
+                });
+            }
+
+            // ============================================
+            // SMOOTH SCROLLING (handled by CSS scroll-behavior)
+            // ============================================
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // ============================================
+            // SCROLL REVEAL (Intersection Observer)
+            // ============================================
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.15,
+                rootMargin: '0px 0px -30px 0px'
+            });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+            timelineItems.forEach(el => revealObserver.observe(el));
+
+            // ============================================
+            // STATISTICS COUNTER ANIMATION
+            // ============================================
+            const statsSection = document.getElementById('stats');
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !statsAnimated) {
+                        statsAnimated = true;
+                        animateCounters();
+                        statsObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            if (statsSection) {
+                statsObserver.observe(statsSection);
+            }
+
+            function animateCounters() {
+                statNumbers.forEach(counter => {
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    const suffix = counter.getAttribute('data-suffix') || '';
+                    const duration = 2000;
+                    const startTime = performance.now();
+                    const startValue = 0;
+
+                    function update(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        // Ease-out cubic
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        const currentValue = Math.round(startValue + (target - startValue) * eased);
+                        counter.textContent = currentValue.toLocaleString() + suffix;
+                        if (progress < 1) {
+                            requestAnimationFrame(update);
+                        } else {
+                            counter.textContent = target.toLocaleString() + suffix;
+                        }
+                    }
+                    requestAnimationFrame(update);
+                });
+            }
+
+            // ============================================
+            // TESTIMONIAL SLIDER / CAROUSEL
+            // ============================================
+            function goToTestimonial(index) {
+                currentTestimonial = index;
+                if (currentTestimonial < 0) currentTestimonial = totalTestimonials - 1;
+                if (currentTestimonial >= totalTestimonials) currentTestimonial = 0;
+                testimonialsTrack.style.transform = `translateX(-${currentTestimonial * 100}%)`;
+                updateTestimonialDots();
+                resetTestimonialAutoPlay();
+            }
+
+            function updateTestimonialDots() {
+                testimonialDots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentTestimonial);
+                });
+            }
+
+            function resetTestimonialAutoPlay() {
+                clearInterval(testimonialInterval);
+                testimonialInterval = setInterval(() => {
+                    goToTestimonial(currentTestimonial + 1);
+                }, 5000);
+            }
+
+            testimonialPrev.addEventListener('click', () => goToTestimonial(currentTestimonial - 1));
+            testimonialNext.addEventListener('click', () => goToTestimonial(currentTestimonial + 1));
+            testimonialDots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    goToTestimonial(parseInt(dot.getAttribute('data-index')));
+                });
+            });
+
+            // Initialize auto-play
+            resetTestimonialAutoPlay();
+
+            // Pause auto-play on hover
+            const testimonialsWrapper = document.querySelector('.testimonials-wrapper');
+            testimonialsWrapper.addEventListener('mouseenter', () => clearInterval(testimonialInterval));
+            testimonialsWrapper.addEventListener('mouseleave', resetTestimonialAutoPlay);
+
+            // ============================================
+            // CONTACT FORM HANDLING
+            // ============================================
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const firstName = document.getElementById('first-name').value.trim();
+                const email = document.getElementById('contact-email').value.trim();
+                const message = document.getElementById('message').value.trim();
+
+                if (!firstName || !email || !message) {
+                    formFeedback.style.display = 'block';
+                    formFeedback.style.color = '#EF4444';
+                    formFeedback.textContent = 'Please fill in all required fields.';
+                    return;
+                }
+                if (!isValidEmail(email)) {
+                    formFeedback.style.display = 'block';
+                    formFeedback.style.color = '#EF4444';
+                    formFeedback.textContent = 'Please enter a valid email address.';
+                    return;
+                }
+                // Simulate successful submission
+                formFeedback.style.display = 'block';
+                formFeedback.style.color = '#10B981';
+                formFeedback.textContent = '✅ Thank you! Your message has been sent successfully. We\'ll get back to you shortly.';
+                contactForm.reset();
+                setTimeout(() => {
+                    formFeedback.style.display = 'none';
+                }, 5000);
+            });
+
+            // ============================================
+            // NEWSLETTER FORM HANDLING
+            // ============================================
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = newsletterForm.querySelector('input[type="email"]');
+                const email = emailInput.value.trim();
+                if (!email || !isValidEmail(email)) {
+                    newsletterFeedback.style.display = 'block';
+                    newsletterFeedback.style.color = '#FCA5A5';
+                    newsletterFeedback.textContent = 'Please enter a valid email address.';
+                    return;
+                }
+                newsletterFeedback.style.display = 'block';
+                newsletterFeedback.style.color = '#6EE7B7';
+                newsletterFeedback.textContent = '🎉 Welcome aboard! You\'re now subscribed to our newsletter.';
+                newsletterForm.reset();
+                setTimeout(() => {
+                    newsletterFeedback.style.display = 'none';
+                }, 5000);
+            });
+
+            // ============================================
+            // EMAIL VALIDATION HELPER
+            // ============================================
+            function isValidEmail(email) {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
+            }
+
+            // ============================================
+            // KEYBOARD ACCESSIBILITY (Escape to close menu)
+            // ============================================
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                    closeMenu();
+                }
+            });
+
+            // ============================================
+            // INITIAL SETUP
+            // ============================================
+            // Set initial active nav link
+            updateActiveNavLink();
+
+            console.log('%c🚗 Jerry Autos %cAbout Page Ready',
+                'font-size:1.4rem;font-weight:bold;color:#F59E0B;',
+                'font-size:1rem;color:#2563EB;');
+            console.log('%cFounded by Ajayi Jeremiah | Driving Trust, Connecting Buyers & Sellers',
+                'color:#94A3B8;');
+        })();
+    </script>
+</body>
+</html>

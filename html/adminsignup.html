@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry Autos - Admin Registration (Firebase)</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ========== All previous CSS remains identical ========== */
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #0f1724;
+            --bg-card: rgba(15, 23, 42, 0.65);
+            --bg-card-fallback: #0f172a;
+            --bg-input: rgba(20, 30, 55, 0.7);
+            --bg-input-focus: rgba(25, 38, 68, 0.85);
+            --border-card: rgba(255, 255, 255, 0.12);
+            --border-input: rgba(255, 255, 255, 0.15);
+            --border-input-focus: rgba(37, 99, 235, 0.6);
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-placeholder: #64748b;
+            --accent: #2563eb;
+            --accent-hover: #3b82f6;
+            --accent-glow: rgba(37, 99, 235, 0.35);
+            --gold: #f59e0b;
+            --gold-hover: #fbbf24;
+            --gold-glow: rgba(245, 158, 11, 0.4);
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-card: 0 8px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-btn: 0 4px 16px rgba(37, 99, 235, 0.35);
+            --shadow-btn-gold: 0 4px 20px rgba(245, 158, 11, 0.4);
+            --glass-blur: blur(22px);
+            --bg-toast-success: rgba(16, 185, 129, 0.9);
+            --bg-toast-error: rgba(239, 68, 68, 0.9);
+            --bg-toast-info: rgba(37, 99, 235, 0.9);
+            --overlay-bg: rgba(0, 0, 0, 0.55);
+            --toggle-bg: rgba(30, 41, 59, 0.8);
+            --toggle-icon: #fbbf24;
+            --strength-bg: rgba(255, 255, 255, 0.1);
+            --footer-text: #94a3b8;
+            --footer-border: rgba(255, 255, 255, 0.08);
+            --dot-color-1: rgba(37, 99, 235, 0.18);
+            --dot-color-2: rgba(245, 158, 11, 0.14);
+            --dot-color-3: rgba(255, 255, 255, 0.06);
+            --radial-1: rgba(37, 99, 235, 0.07);
+            --radial-2: rgba(245, 158, 11, 0.05);
+            --radial-3: rgba(15, 23, 42, 0.9);
+        }
+
+        body.light-mode {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-card-fallback: #ffffff;
+            --bg-input: rgba(241, 245, 249, 0.8);
+            --bg-input-focus: rgba(255, 255, 255, 0.95);
+            --border-card: rgba(0, 0, 0, 0.1);
+            --border-input: rgba(0, 0, 0, 0.15);
+            --border-input-focus: rgba(37, 99, 235, 0.55);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-placeholder: #94a3b8;
+            --shadow-card: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-btn: 0 4px 16px rgba(37, 99, 235, 0.3);
+            --shadow-btn-gold: 0 4px 20px rgba(245, 158, 11, 0.35);
+            --glass-blur: blur(20px);
+            --bg-toast-success: rgba(16, 185, 129, 0.92);
+            --bg-toast-error: rgba(239, 68, 68, 0.92);
+            --bg-toast-info: rgba(37, 99, 235, 0.92);
+            --overlay-bg: rgba(0, 0, 0, 0.35);
+            --toggle-bg: rgba(203, 213, 225, 0.75);
+            --toggle-icon: #f59e0b;
+            --strength-bg: rgba(0, 0, 0, 0.06);
+            --footer-text: #64748b;
+            --footer-border: rgba(0, 0, 0, 0.08);
+            --dot-color-1: rgba(37, 99, 235, 0.1);
+            --dot-color-2: rgba(245, 158, 11, 0.08);
+            --dot-color-3: rgba(0, 0, 0, 0.03);
+            --radial-1: rgba(37, 99, 235, 0.04);
+            --radial-2: rgba(245, 158, 11, 0.03);
+            --radial-3: rgba(248, 250, 252, 0.85);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { font-size:16px; scroll-behavior:smooth; }
+
+        body {
+            font-family:'Inter', sans-serif;
+            background:var(--bg-primary);
+            color:var(--text-primary);
+            min-height:100vh;
+            display:flex; align-items:center; justify-content:center;
+            position:relative; overflow-x:hidden;
+            transition:background 0.5s ease, color 0.5s ease;
+            padding:20px;
+        }
+
+        /* (Background orbs, grid, particles – unchanged) */
+        .bg-canvas{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+        .bg-canvas .orb{position:absolute; border-radius:50%; filter:blur(100px); opacity:0.7; animation:floatOrb 14s infinite ease-in-out;}
+        .bg-canvas .orb-1{width:500px; height:500px; background:var(--radial-1); top:-15%; left:-10%; animation-delay:0s;}
+        .bg-canvas .orb-2{width:400px; height:400px; background:var(--radial-2); bottom:-12%; right:-8%; animation-delay:-5s; animation-duration:16s;}
+        .bg-canvas .orb-3{width:350px; height:350px; background:var(--radial-3); top:50%; left:50%; transform:translate(-50%,-50%); animation-delay:-9s; animation-duration:18s;}
+        @keyframes floatOrb{0%,100%{transform:translate(0,0) scale(1);}25%{transform:translate(60px,-40px) scale(1.08);}50%{transform:translate(-30px,30px) scale(0.94);}75%{transform:translate(-50px,-20px) scale(1.05);}}
+        .bg-grid{position:fixed; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.018) 1px,transparent 1px); background-size:50px 50px; opacity:0.7;}
+        body.light-mode .bg-grid{background-image:linear-gradient(rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(90deg, rgba(0,0,0,0.04) 1px,transparent 1px); opacity:0.5;}
+        .particles{position:fixed; inset:0; z-index:0; pointer-events:none;}
+        .particle{position:absolute; border-radius:50%; animation:driftUp 12s infinite linear; opacity:0;}
+        .particle:nth-child(1){width:3px; height:3px; background:var(--dot-color-1); left:15%; animation-delay:0s; animation-duration:10s;}
+        .particle:nth-child(2){width:2px; height:2px; background:var(--dot-color-2); left:35%; animation-delay:-3s; animation-duration:13s;}
+        .particle:nth-child(3){width:4px; height:4px; background:var(--dot-color-1); left:55%; animation-delay:-6s; animation-duration:11s;}
+        .particle:nth-child(4){width:2px; height:2px; background:var(--dot-color-3); left:70%; animation-delay:-8s; animation-duration:14s;}
+        .particle:nth-child(5){width:3px; height:3px; background:var(--dot-color-2); left:85%; animation-delay:-2s; animation-duration:12s;}
+        .particle:nth-child(6){width:2px; height:2px; background:var(--dot-color-1); left:25%; animation-delay:-10s; animation-duration:15s;}
+        @keyframes driftUp{0%{bottom:-5%; opacity:0; transform:translateX(0) scale(0.5);}10%{opacity:0.7;}80%{opacity:0.3;}100%{bottom:105%; opacity:0; transform:translateX(40px) scale(1.4);}}
+
+        /* Theme Toggle */
+        .theme-toggle{position:fixed; top:24px; right:24px; z-index:1000; width:48px; height:48px; border-radius:50%; background:var(--toggle-bg); border:1.5px solid var(--border-card); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--toggle-icon); transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1.2); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); box-shadow:0 4px 16px rgba(0,0,0,0.2); outline:none;}
+        .theme-toggle:hover{transform:scale(1.1) rotate(25deg); box-shadow:0 6px 24px rgba(0,0,0,0.3);}
+        .theme-toggle:active{transform:scale(0.92); transition:all 0.15s ease;}
+        body.light-mode .theme-toggle .icon-moon{display:none;}
+        body.light-mode .theme-toggle .icon-sun{display:inline-block;}
+        body:not(.light-mode) .theme-toggle .icon-sun{display:none;}
+        body:not(.light-mode) .theme-toggle .icon-moon{display:inline-block;}
+
+        /* Main Container */
+        .main-container{position:relative; z-index:1; width:100%; max-width:620px; display:flex; flex-direction:column; align-items:center; gap:20px;}
+
+        /* Logo */
+        .logo-section{text-align:center; animation:fadeInDown 0.7s ease-out;}
+        .logo-link{text-decoration:none; display:inline-flex; align-items:center; gap:10px; cursor:pointer;}
+        .logo-icon-wrapper{position:relative; width:50px; height:50px; background:linear-gradient(135deg,#2563eb,#1d4ed8); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 24px rgba(37,99,235,0.4); transition:transform 0.3s ease, box-shadow 0.3s ease;}
+        .logo-icon-wrapper i{font-size:1.5rem; color:#fff;}
+        .logo-icon-wrapper .logo-accent-dot{position:absolute; top:-5px; right:-5px; width:12px; height:12px; background:#f59e0b; border-radius:50%; border:2px solid var(--bg-primary); box-shadow:0 0 12px rgba(245,158,11,0.6);}
+        .logo-text{display:flex; flex-direction:column; align-items:flex-start;}
+        .logo-text .brand-name{font-family:'Outfit',sans-serif; font-weight:800; font-size:1.6rem; letter-spacing:-0.02em; color:var(--text-primary); line-height:1; transition:color 0.5s ease;}
+        .logo-text .brand-name .accent{color:#f59e0b;}
+        .logo-text .brand-subtitle{font-size:0.7rem; font-weight:500; letter-spacing:0.18em; color:var(--text-muted); text-transform:uppercase;}
+
+        @keyframes fadeInDown{ from{opacity:0; transform:translateY(-30px);} to{opacity:1; transform:translateY(0);} }
+
+        /* Card */
+        .card{width:100%; background:var(--bg-card); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border:1.5px solid var(--border-card); border-radius:20px; padding:36px 32px 28px; box-shadow:var(--shadow-card); transition:all 0.5s ease; animation:fadeInUp 0.7s ease-out 0.1s both; position:relative; overflow:hidden;}
+        .card::before{content:''; position:absolute; top:-1px; left:30px; right:30px; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.3), rgba(245,158,11,0.5), rgba(255,255,255,0.3), transparent); border-radius:50%; opacity:0.7;}
+        body.light-mode .card::before{background:linear-gradient(90deg, transparent, rgba(37,99,235,0.25), rgba(245,158,11,0.4), rgba(37,99,235,0.25), transparent);}
+        @keyframes fadeInUp{ from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+
+        .card-header{text-align:center; margin-bottom:26px;}
+        .card-header h1{font-family:'Outfit',sans-serif; font-weight:700; font-size:1.5rem; color:var(--text-primary); margin-bottom:4px; transition:color 0.5s ease;}
+        .card-header p{font-size:0.88rem; color:var(--text-muted); transition:color 0.5s ease;}
+        .card-header .admin-badge{display:inline-block; background:linear-gradient(135deg,#f59e0b,#e68900); color:#0f172a; font-size:0.7rem; font-weight:700; padding:4px 12px; border-radius:20px; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:10px;}
+
+        /* Form Grid */
+        .form-grid{display:grid; grid-template-columns:1fr; gap:16px;}
+        @media(min-width:580px){.form-grid{grid-template-columns:1fr 1fr; gap:16px 18px;}.form-grid .full-width{grid-column:1/-1;}}
+        .form-group{display:flex; flex-direction:column; gap:5px; animation:fadeInUp 0.5s ease-out both;}
+        .form-group:nth-child(1){animation-delay:0.15s;} .form-group:nth-child(2){animation-delay:0.2s;} .form-group:nth-child(3){animation-delay:0.25s;} .form-group:nth-child(4){animation-delay:0.3s;} .form-group:nth-child(5){animation-delay:0.35s;} .form-group:nth-child(6){animation-delay:0.4s;} .form-group:nth-child(7){animation-delay:0.45s;}
+
+        .form-group label{font-size:0.82rem; font-weight:600; color:var(--text-secondary); letter-spacing:0.01em; transition:color 0.5s ease;}
+        .form-group label i{margin-right:6px; color:var(--accent); font-size:0.75rem; width:14px; text-align:center;}
+
+        .input-wrapper{position:relative;}
+        .input-wrapper input{width:100%; padding:13px 14px; padding-right:42px; font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:400; color:var(--text-primary); background:var(--bg-input); border:1.5px solid var(--border-input); border-radius:12px; outline:none; transition:all 0.3s ease; letter-spacing:0.01em;}
+        .input-wrapper input::placeholder{color:var(--text-placeholder); font-weight:400;}
+        .input-wrapper input:focus{border-color:var(--border-input-focus); background:var(--bg-input-focus); box-shadow:0 0 0 4px var(--accent-glow);}
+        .input-wrapper input.input-error{border-color:#ef4444 !important; box-shadow:0 0 0 4px rgba(239,68,68,0.2) !important;}
+        .input-wrapper input.input-success{border-color:#10b981 !important; box-shadow:0 0 0 4px rgba(16,185,129,0.2) !important;}
+
+        .input-wrapper .toggle-password{position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.95rem; padding:6px; border-radius:6px; transition:all 0.25s ease; z-index:2; line-height:1;}
+        .input-wrapper .toggle-password:hover{color:var(--text-primary); background:rgba(128,128,128,0.1);}
+        .input-wrapper .validation-icon{position:absolute; right:38px; top:50%; transform:translateY(-50%); font-size:0.8rem; pointer-events:none; opacity:0; transition:opacity 0.3s ease; z-index:1;}
+        .input-wrapper .validation-icon.show{opacity:1;}
+        .input-wrapper .validation-icon.valid{color:#10b981;}
+        .input-wrapper .validation-icon.invalid{color:#ef4444;}
+        .input-wrapper.has-toggle .validation-icon{right:40px;}
+
+        .error-message{font-size:0.72rem; color:#ef4444; min-height:17px; font-weight:500; letter-spacing:0.01em; transition:all 0.25s ease;}
+
+        .password-strength{margin-top:2px;}
+        .strength-bar-wrap{height:5px; background:var(--strength-bg); border-radius:10px; overflow:hidden; margin-bottom:3px;}
+        .strength-bar-fill{height:100%; border-radius:10px; transition:width 0.4s ease, background 0.4s ease; width:0%;}
+        .strength-bar-fill.weak{width:20%; background:#ef4444;}
+        .strength-bar-fill.fair{width:40%; background:#f97316;}
+        .strength-bar-fill.good{width:60%; background:#eab308;}
+        .strength-bar-fill.strong{width:80%; background:#22c55e;}
+        .strength-bar-fill.very-strong{width:100%; background:#10b981;}
+        .strength-text{font-size:0.7rem; font-weight:600; letter-spacing:0.02em; transition:color 0.3s ease;}
+        .strength-text.weak{color:#ef4444;} .strength-text.fair{color:#f97316;} .strength-text.good{color:#eab308;} .strength-text.strong{color:#22c55e;} .strength-text.very-strong{color:#10b981;}
+
+        .terms-group{display:flex; align-items:flex-start; gap:10px; margin-top:4px;}
+        .terms-group input[type="checkbox"]{display:none;}
+        .terms-group .custom-checkbox{flex-shrink:0; width:22px; height:22px; border:2px solid var(--border-input); border-radius:6px; cursor:pointer; position:relative; transition:all 0.3s ease; background:var(--bg-input); display:flex; align-items:center; justify-content:center;}
+        .terms-group input:checked+.custom-checkbox{background:#2563eb; border-color:#2563eb; box-shadow:0 0 0 4px rgba(37,99,235,0.25);}
+        .terms-group input:checked+.custom-checkbox::after{content:'\f00c'; font-family:'Font Awesome 6 Free'; font-weight:900; color:#fff; font-size:0.65rem;}
+        .terms-group .terms-label{font-size:0.8rem; color:var(--text-secondary); cursor:pointer; line-height:1.4; transition:color 0.5s ease;}
+        .terms-group .terms-label a{color:#2563eb; text-decoration:none; font-weight:600;}
+        .terms-group .terms-label a:hover{color:#3b82f6; text-decoration:underline;}
+        .terms-error{font-size:0.72rem; color:#ef4444; min-height:17px; font-weight:500; margin-top:2px;}
+
+        .btn-submit{width:100%; padding:14px 20px; font-family:'Outfit',sans-serif; font-size:1rem; font-weight:700; letter-spacing:0.03em; color:#fff; background:linear-gradient(135deg,#2563eb,#1d4ed8); border:none; border-radius:14px; cursor:pointer; transition:all 0.35s ease; box-shadow:var(--shadow-btn); position:relative; overflow:hidden; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:8px;}
+        .btn-submit:hover{background:linear-gradient(135deg,#3b82f6,#2563eb); box-shadow:0 6px 28px rgba(37,99,235,0.5); transform:translateY(-2px);}
+        .btn-submit:active{transform:translateY(0); box-shadow:0 2px 10px rgba(37,99,235,0.3);}
+        .btn-submit:disabled{opacity:0.6; cursor:not-allowed; pointer-events:none;}
+        .btn-submit.loading{pointer-events:none;}
+        .btn-submit .btn-text{transition:opacity 0.3s ease;}
+        .btn-submit.loading .btn-text{opacity:0;}
+        .btn-submit .spinner{position:absolute; width:22px; height:22px; border:3px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; opacity:0; pointer-events:none; transition:opacity 0.3s ease;}
+        .btn-submit.loading .spinner{opacity:1;}
+        @keyframes spin{ to{transform:rotate(360deg);} }
+        .btn-submit .ripple{position:absolute; border-radius:50%; background:rgba(255,255,255,0.35); transform:scale(0); animation:rippleEffect 0.7s ease-out forwards; pointer-events:none;}
+        @keyframes rippleEffect{ to{transform:scale(4); opacity:0;} }
+
+        .signin-link{text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-muted); transition:color 0.5s ease;}
+        .signin-link a{color:#2563eb; text-decoration:none; font-weight:600;}
+        .signin-link a:hover{color:#3b82f6; text-decoration:underline;}
+
+        .footer{text-align:center; font-size:0.75rem; color:var(--footer-text); padding:12px 0; border-top:1px solid var(--footer-border); width:100%; max-width:620px; transition:color 0.5s ease, border-color 0.5s ease; animation:fadeInUp 0.7s ease-out 0.5s both;}
+        .footer span{color:#f59e0b; font-weight:600;}
+
+        .toast-container{position:fixed; top:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; pointer-events:none;}
+        .toast{pointer-events:auto; padding:14px 20px; border-radius:12px; color:#fff; font-weight:600; font-size:0.88rem; letter-spacing:0.01em; box-shadow:0 8px 30px rgba(0,0,0,0.3); display:flex; align-items:center; gap:10px; animation:slideInToast 0.4s cubic-bezier(0.25,0.8,0.25,1.2) forwards; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); max-width:420px; min-width:260px;}
+        .toast.success{background:var(--bg-toast-success); border:1px solid rgba(255,255,255,0.2);}
+        .toast.error{background:var(--bg-toast-error); border:1px solid rgba(255,255,255,0.2);}
+        .toast.info{background:var(--bg-toast-info); border:1px solid rgba(255,255,255,0.2);}
+        .toast.removing{animation:slideOutToast 0.35s ease-in forwards;}
+        @keyframes slideInToast{ from{transform:translateX(120%); opacity:0;} to{transform:translateX(0); opacity:1;} }
+        @keyframes slideOutToast{ from{transform:translateX(0); opacity:1;} to{transform:translateX(120%); opacity:0;} }
+        .toast i{font-size:1.1rem; flex-shrink:0;}
+
+        .success-overlay{position:fixed; inset:0; z-index:8000; background:var(--overlay-bg); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.4s ease; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);}
+        .success-overlay.active{opacity:1; pointer-events:auto;}
+        .success-modal{background:var(--bg-card); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border:1.5px solid var(--border-card); border-radius:20px; padding:40px 30px; text-align:center; max-width:440px; width:90%; box-shadow:var(--shadow-card); animation:popIn 0.5s cubic-bezier(0.25,0.8,0.25,1.3);}
+        @keyframes popIn{ from{transform:scale(0.85); opacity:0;} to{transform:scale(1); opacity:1;} }
+        .success-modal .check-icon{width:70px; height:70px; border-radius:50%; background:linear-gradient(135deg,#10b981,#059669); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; font-size:2rem; color:#fff; box-shadow:0 8px 30px rgba(16,185,129,0.4); animation:pulseCheck 1.5s ease-in-out infinite;}
+        @keyframes pulseCheck{0%,100%{box-shadow:0 8px 30px rgba(16,185,129,0.4);}50%{box-shadow:0 8px 50px rgba(16,185,129,0.7);}}
+        .success-modal h2{font-family:'Outfit',sans-serif; font-weight:700; font-size:1.4rem; color:var(--text-primary); margin-bottom:6px;}
+        .success-modal p{color:var(--text-muted); font-size:0.9rem; margin-bottom:8px;}
+        .success-modal .redirect-info{font-size:0.78rem; color:#f59e0b; font-weight:500; display:flex; align-items:center; justify-content:center; gap:6px;}
+        .success-modal .redirect-info .dot-pulse{display:inline-flex; gap:3px;}
+        .success-modal .redirect-info .dot-pulse span{width:5px; height:5px; border-radius:50%; background:#f59e0b; animation:dotBounce 1.2s infinite ease-in-out;}
+        .success-modal .redirect-info .dot-pulse span:nth-child(2){animation-delay:0.2s;}
+        .success-modal .redirect-info .dot-pulse span:nth-child(3){animation-delay:0.4s;}
+        @keyframes dotBounce{0%,80%,100%{transform:translateY(0); opacity:0.4;}40%{transform:translateY(-8px); opacity:1;}}
+        .btn-close-modal{margin-top:18px; padding:10px 28px; font-family:'Outfit',sans-serif; font-weight:600; font-size:0.9rem; letter-spacing:0.02em; color:#fff; background:linear-gradient(135deg,#2563eb,#1d4ed8); border:none; border-radius:25px; cursor:pointer; transition:all 0.3s ease; box-shadow:0 4px 16px rgba(37,99,235,0.35);}
+        .btn-close-modal:hover{background:linear-gradient(135deg,#3b82f6,#2563eb); box-shadow:0 6px 24px rgba(37,99,235,0.5); transform:translateY(-2px);}
+
+        @media(max-width:640px){
+            .card{padding:24px 18px 20px; border-radius:16px;}
+            .card::before{left:16px; right:16px;}
+            .card-header h1{font-size:1.25rem;}
+            .card-header p{font-size:0.8rem;}
+            .logo-text .brand-name{font-size:1.3rem;}
+            .logo-icon-wrapper{width:40px; height:40px; border-radius:11px;}
+            .logo-icon-wrapper i{font-size:1.2rem;}
+            .input-wrapper input{padding:11px 12px; padding-right:36px; font-size:0.85rem; border-radius:10px;}
+            .btn-submit{padding:12px 16px; font-size:0.9rem; border-radius:12px;}
+            .theme-toggle{top:12px; right:12px; width:40px; height:40px; font-size:1.1rem;}
+            .toast-container{top:12px; right:8px; left:8px; align-items:stretch;}
+            .toast{max-width:100%; font-size:0.8rem; padding:12px 16px;}
+            body{padding:12px;}
+        }
+        @media(max-width:380px){
+            .card{padding:18px 12px 16px; border-radius:14px;}
+            .input-wrapper input{padding:10px 10px; padding-right:32px; font-size:0.8rem;}
+            .card-header h1{font-size:1.1rem;}
+            .logo-text .brand-name{font-size:1.1rem;}
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Elements (unchanged) -->
+    <div class="bg-canvas">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="bg-grid"></div>
+    <div class="particles">
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fa-solid fa-moon icon-moon"></i>
+        <i class="fa-solid fa-sun icon-sun"></i>
+    </button>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-modal">
+            <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+            <h2>Admin Account Created!</h2>
+            <p>You’re all set. Taking you to the dashboard…</p>
+            <div class="redirect-info">
+                <span>Redirecting now</span>
+                <span class="dot-pulse"><span></span><span></span><span></span></span>
+            </div>
+            <button class="btn-close-modal" id="btnCloseModal">Go to Dashboard <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="logo-section">
+            <a class="logo-link" href="#">
+                <div class="logo-icon-wrapper">
+                    <i class="fa-solid fa-steering-wheel"></i>
+                    <span class="logo-accent-dot"></span>
+                </div>
+                <div class="logo-text">
+                    <span class="brand-name">JERRY <span class="accent">AUTOS</span></span>
+                    <span class="brand-subtitle">Admin Portal</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="card" id="signupCard">
+            <div class="card-header">
+                <span class="admin-badge"><i class="fa-solid fa-shield-halved"></i> Firebase Admin Registration</span>
+                <h1>Create Admin Account</h1>
+                <p>Your details will be securely stored with Firebase</p>
+            </div>
+
+            <form id="signupForm" novalidate>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fullName"><i class="fa-solid fa-user"></i> Full Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="fullName" placeholder="John Doe" autocomplete="name" maxlength="80">
+                            <span class="validation-icon" id="iconFullName"></span>
+                        </div>
+                        <span class="error-message" id="errorFullName"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="username"><i class="fa-solid fa-at"></i> Username</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="username" placeholder="john_doe_admin" autocomplete="username" maxlength="40">
+                            <span class="validation-icon" id="iconUsername"></span>
+                        </div>
+                        <span class="error-message" id="errorUsername"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" placeholder="admin@jerryautos.com" autocomplete="email" maxlength="100">
+                            <span class="validation-icon" id="iconEmail"></span>
+                        </div>
+                        <span class="error-message" id="errorEmail"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone"><i class="fa-solid fa-phone"></i> Phone Number</label>
+                        <div class="input-wrapper">
+                            <input type="tel" id="phone" placeholder="+1 (555) 123-4567" autocomplete="tel" maxlength="20">
+                            <span class="validation-icon" id="iconPhone"></span>
+                        </div>
+                        <span class="error-message" id="errorPhone"></span>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="accessCode"><i class="fa-solid fa-key"></i> Admin Access Code</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="accessCode" placeholder="Enter admin secret code" autocomplete="off" maxlength="30">
+                            <span class="validation-icon" id="iconAccessCode"></span>
+                        </div>
+                        <span class="error-message" id="errorAccessCode"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+                        <div class="input-wrapper has-toggle">
+                            <input type="password" id="password" placeholder="••••••••" autocomplete="new-password" maxlength="60">
+                            <button type="button" class="toggle-password" data-target="password" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
+                            <span class="validation-icon" id="iconPassword"></span>
+                        </div>
+                        <span class="error-message" id="errorPassword"></span>
+                        <div class="password-strength" id="passwordStrengthContainer">
+                            <div class="strength-bar-wrap"><div class="strength-bar-fill" id="strengthBarFill"></div></div>
+                            <span class="strength-text" id="strengthText"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword"><i class="fa-solid fa-lock"></i> Confirm Password</label>
+                        <div class="input-wrapper has-toggle">
+                            <input type="password" id="confirmPassword" placeholder="••••••••" autocomplete="new-password" maxlength="60">
+                            <button type="button" class="toggle-password" data-target="confirmPassword" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
+                            <span class="validation-icon" id="iconConfirmPassword"></span>
+                        </div>
+                        <span class="error-message" id="errorConfirmPassword"></span>
+                    </div>
+                </div>
+
+                <div class="form-group full-width" style="margin-top:8px;">
+                    <div class="terms-group">
+                        <input type="checkbox" id="termsCheckbox">
+                        <label class="custom-checkbox" for="termsCheckbox"></label>
+                        <label class="terms-label" for="termsCheckbox">I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a></label>
+                    </div>
+                    <span class="terms-error" id="errorTerms"></span>
+                </div>
+
+                <button type="submit" class="btn-submit full-width" id="btnSubmit">
+                    <span class="btn-text"><i class="fa-solid fa-user-plus"></i> Create Admin Account</span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+
+            <p class="signin-link">Already have an account? <a href="#"><strong>Sign In</strong></a></p>
+        </div>
+
+        <div class="footer">
+            &copy; <span id="currentYear"></span> <span>Jerry Autos</span> · Firebase Auth & Firestore
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ========== FIREBASE CONFIGURATION ==========
+            // ⚠️ REPLACE WITH YOUR OWN FIREBASE PROJECT CONFIG
+            const firebaseConfig = {
+                apiKey: "AIzaSyDummyKeyForDemoPurposesOnly",
+                authDomain: "jerry-autos-demo.firebaseapp.com",
+                projectId: "jerry-autos-demo",
+                storageBucket: "jerry-autos-demo.appspot.com",
+                messagingSenderId: "123456789012",
+                appId: "1:123456789012:web:abcdef1234567890abcdef"
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            console.log('🔥 Firebase initialized (replace config with your own)');
+
+            // ========== DOM ELEMENTS ==========
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const signupForm = document.getElementById('signupForm');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const toastContainer = document.getElementById('toastContainer');
+            const successOverlay = document.getElementById('successOverlay');
+            const btnCloseModal = document.getElementById('btnCloseModal');
+            const currentYearSpan = document.getElementById('currentYear');
+
+            const fields = {
+                fullName: document.getElementById('fullName'),
+                username: document.getElementById('username'),
+                email: document.getElementById('email'),
+                phone: document.getElementById('phone'),
+                accessCode: document.getElementById('accessCode'),
+                password: document.getElementById('password'),
+                confirmPassword: document.getElementById('confirmPassword'),
+                terms: document.getElementById('termsCheckbox'),
+            };
+
+            const errorSpans = {
+                fullName: document.getElementById('errorFullName'),
+                username: document.getElementById('errorUsername'),
+                email: document.getElementById('errorEmail'),
+                phone: document.getElementById('errorPhone'),
+                accessCode: document.getElementById('errorAccessCode'),
+                password: document.getElementById('errorPassword'),
+                confirmPassword: document.getElementById('errorConfirmPassword'),
+                terms: document.getElementById('errorTerms'),
+            };
+
+            const validationIcons = {
+                fullName: document.getElementById('iconFullName'),
+                username: document.getElementById('iconUsername'),
+                email: document.getElementById('iconEmail'),
+                phone: document.getElementById('iconPhone'),
+                accessCode: document.getElementById('iconAccessCode'),
+                password: document.getElementById('iconPassword'),
+                confirmPassword: document.getElementById('iconConfirmPassword'),
+            };
+
+            const strengthBarFill = document.getElementById('strengthBarFill');
+            const strengthText = document.getElementById('strengthText');
+            const passwordStrengthContainer = document.getElementById('passwordStrengthContainer');
+
+            // ========== INIT ==========
+            currentYearSpan.textContent = new Date().getFullYear();
+            passwordStrengthContainer.style.display = 'none';
+
+            // Theme toggle (localStorage)
+            if (localStorage.getItem('jerry-autos-theme') === 'light') {
+                body.classList.add('light-mode');
+            }
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('light-mode');
+                localStorage.setItem('jerry-autos-theme', body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+
+            // Password visibility toggle
+            document.querySelectorAll('.toggle-password').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = document.getElementById(btn.dataset.target);
+                    const icon = btn.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.replace('fa-eye', 'fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.replace('fa-eye-slash', 'fa-eye');
+                    }
+                });
+            });
+
+            // ========== VALIDATION (same as before) ==========
+            function showFieldError(key, msg) {
+                errorSpans[key].textContent = msg;
+                if (fields[key] && fields[key].type !== 'checkbox') {
+                    fields[key].classList.add('input-error');
+                    fields[key].classList.remove('input-success');
+                }
+                if (validationIcons[key]) {
+                    validationIcons[key].classList.add('show', 'invalid');
+                    validationIcons[key].classList.remove('valid');
+                    validationIcons[key].innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+                }
+            }
+            function showFieldSuccess(key) {
+                errorSpans[key].textContent = '';
+                if (fields[key] && fields[key].type !== 'checkbox') {
+                    fields[key].classList.remove('input-error');
+                    fields[key].classList.add('input-success');
+                }
+                if (validationIcons[key]) {
+                    validationIcons[key].classList.add('show', 'valid');
+                    validationIcons[key].classList.remove('invalid');
+                    validationIcons[key].innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                }
+            }
+            function clearFieldState(key) {
+                errorSpans[key].textContent = '';
+                if (fields[key] && fields[key].type !== 'checkbox') {
+                    fields[key].classList.remove('input-error', 'input-success');
+                }
+                if (validationIcons[key]) {
+                    validationIcons[key].classList.remove('show', 'valid', 'invalid');
+                    validationIcons[key].innerHTML = '';
+                }
+            }
+
+            function validateFullName() {
+                const v = fields.fullName.value.trim();
+                if (!v) { showFieldError('fullName','Full name required.'); return false; }
+                if (v.length < 2) { showFieldError('fullName','At least 2 characters.'); return false; }
+                if (!/^[a-zA-Z\s\-'.]+$/.test(v)) { showFieldError('fullName','Invalid characters.'); return false; }
+                showFieldSuccess('fullName'); return true;
+            }
+            function validateUsername() {
+                const v = fields.username.value.trim();
+                if (!v) { showFieldError('username','Username required.'); return false; }
+                if (v.length < 3) { showFieldError('username','At least 3 characters.'); return false; }
+                if (!/^[a-zA-Z0-9_]+$/.test(v)) { showFieldError('username','Only letters, numbers, underscores.'); return false; }
+                showFieldSuccess('username'); return true;
+            }
+            function validateEmail() {
+                const v = fields.email.value.trim();
+                if (!v) { showFieldError('email','Email required.'); return false; }
+                if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v)) { showFieldError('email','Invalid email.'); return false; }
+                if (v.length > 100) { showFieldError('email','Email too long.'); return false; }
+                showFieldSuccess('email'); return true;
+            }
+            function validatePhone() {
+                const v = fields.phone.value.trim();
+                if (!v) { showFieldError('phone','Phone number required.'); return false; }
+                if (!/^\+?[\d\s\-().]{7,20}$/.test(v)) { showFieldError('phone','Invalid phone format.'); return false; }
+                if (v.replace(/\D/g,'').length < 7) { showFieldError('phone','At least 7 digits.'); return false; }
+                showFieldSuccess('phone'); return true;
+            }
+            function validateAccessCode() {
+                const v = fields.accessCode.value.trim();
+                if (!v) { showFieldError('accessCode','Access code required.'); return false; }
+                if (v.length < 6) { showFieldError('accessCode','At least 6 characters.'); return false; }
+                showFieldSuccess('accessCode'); return true;
+            }
+
+            function calcPasswordStrength(pw) {
+                let score = 0;
+                if (pw.length >= 8) score++;
+                if (pw.length >= 12) score++;
+                if (/[a-z]/.test(pw)) score++;
+                if (/[A-Z]/.test(pw)) score++;
+                if (/\d/.test(pw)) score++;
+                if (/[^a-zA-Z0-9]/.test(pw)) score++;
+                if (pw.length >= 16) score++;
+                return score;
+            }
+            function updateStrengthUI() {
+                const pw = fields.password.value;
+                if (!pw) {
+                    passwordStrengthContainer.style.display = 'none';
+                    strengthBarFill.className = 'strength-bar-fill';
+                    strengthBarFill.style.width = '0%';
+                    strengthText.textContent = '';
+                    return;
+                }
+                passwordStrengthContainer.style.display = 'block';
+                const score = calcPasswordStrength(pw);
+                let level, label, cls;
+                if (score <= 1) { level='weak'; label='Weak'; cls='weak'; }
+                else if (score <= 2) { level='fair'; label='Fair'; cls='fair'; }
+                else if (score <= 3) { level='good'; label='Good'; cls='good'; }
+                else if (score <= 5) { level='strong'; label='Strong'; cls='strong'; }
+                else { level='very-strong'; label='Very Strong'; cls='very-strong'; }
+                strengthBarFill.className = 'strength-bar-fill '+cls;
+                strengthBarFill.style.width = '';
+                strengthText.textContent = label;
+                strengthText.className = 'strength-text '+cls;
+            }
+            function validatePassword() {
+                const v = fields.password.value;
+                if (!v) { showFieldError('password','Password required.'); passwordStrengthContainer.style.display='none'; return false; }
+                if (v.length < 8) { showFieldError('password','Minimum 8 characters.'); updateStrengthUI(); return false; }
+                if (calcPasswordStrength(v) < 3) { showFieldError('password','Too weak. Mix letters, numbers, symbols.'); updateStrengthUI(); return false; }
+                showFieldSuccess('password');
+                updateStrengthUI();
+                return true;
+            }
+            function validateConfirmPassword() {
+                const v = fields.confirmPassword.value;
+                if (!v) { showFieldError('confirmPassword','Confirm your password.'); return false; }
+                if (v !== fields.password.value) { showFieldError('confirmPassword','Passwords do not match.'); return false; }
+                showFieldSuccess('confirmPassword'); return true;
+            }
+            function validateTerms() {
+                if (!fields.terms.checked) { errorSpans.terms.textContent = 'You must agree to the terms.'; return false; }
+                errorSpans.terms.textContent = ''; return true;
+            }
+
+            // Attach real-time validation
+            fields.fullName.addEventListener('blur', validateFullName);
+            fields.fullName.addEventListener('input', ()=>{ if(fields.fullName.classList.contains('input-error')||fields.fullName.classList.contains('input-success')) validateFullName(); });
+            fields.username.addEventListener('blur', validateUsername);
+            fields.username.addEventListener('input', ()=>{ if(fields.username.classList.contains('input-error')||fields.username.classList.contains('input-success')) validateUsername(); });
+            fields.email.addEventListener('blur', validateEmail);
+            fields.email.addEventListener('input', ()=>{ if(fields.email.classList.contains('input-error')||fields.email.classList.contains('input-success')) validateEmail(); });
+            fields.phone.addEventListener('blur', validatePhone);
+            fields.phone.addEventListener('input', ()=>{ if(fields.phone.classList.contains('input-error')||fields.phone.classList.contains('input-success')) validatePhone(); });
+            fields.accessCode.addEventListener('blur', validateAccessCode);
+            fields.accessCode.addEventListener('input', ()=>{ if(fields.accessCode.classList.contains('input-error')||fields.accessCode.classList.contains('input-success')) validateAccessCode(); });
+            fields.password.addEventListener('input', ()=>{
+                updateStrengthUI();
+                if(fields.password.classList.contains('input-error')||fields.password.classList.contains('input-success')) validatePassword();
+                if(fields.confirmPassword.value) validateConfirmPassword();
+            });
+            fields.password.addEventListener('blur', validatePassword);
+            fields.confirmPassword.addEventListener('blur', validateConfirmPassword);
+            fields.confirmPassword.addEventListener('input', ()=>{ if(fields.confirmPassword.classList.contains('input-error')||fields.confirmPassword.classList.contains('input-success')) validateConfirmPassword(); });
+            fields.terms.addEventListener('change', ()=>{ if(fields.terms.checked) errorSpans.terms.textContent=''; validateTerms(); });
+
+            // Toast system
+            function showToast(msg, type='info', dur=4000) {
+                const toast = document.createElement('div');
+                toast.className = 'toast '+type;
+                let icon = '';
+                if (type==='success') icon='<i class="fa-solid fa-circle-check"></i>';
+                else if (type==='error') icon='<i class="fa-solid fa-circle-xmark"></i>';
+                else icon='<i class="fa-solid fa-circle-info"></i>';
+                toast.innerHTML = icon + ' <span>'+msg+'</span>';
+                toastContainer.appendChild(toast);
+                const timer = setTimeout(()=> removeToast(toast), dur);
+                toast.addEventListener('click', ()=>{ clearTimeout(timer); removeToast(toast); });
+            }
+            function removeToast(toast) {
+                if (toast.classList.contains('removing')) return;
+                toast.classList.add('removing');
+                toast.addEventListener('animationend', ()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, {once:true});
+                setTimeout(()=>{ if(toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+            }
+
+            // Ripple effect
+            btnSubmit.addEventListener('click', function(e){
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size+'px';
+                ripple.style.left = (e.clientX - rect.left - size/2)+'px';
+                ripple.style.top = (e.clientY - rect.top - size/2)+'px';
+                this.appendChild(ripple);
+                ripple.addEventListener('animationend', ()=> ripple.remove());
+            });
+
+            // ========== FIREBASE REGISTRATION LOGIC ==========
+            async function performFirebaseRegistration(formData) {
+                const { fullName, username, email, phone, accessCode, password } = formData;
+
+                // Verify admin access code against Firestore (collection "accessCodes")
+                const accessDocRef = db.collection('accessCodes').doc(accessCode);
+                const accessDoc = await accessDocRef.get();
+                if (!accessDoc.exists) {
+                    throw new Error('Invalid admin access code. Please contact the system administrator.');
+                }
+
+                // Create user with email/password
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // Update display name
+                await user.updateProfile({ displayName: fullName });
+
+                // Store additional admin data in Firestore "admins" collection
+                await db.collection('admins').doc(user.uid).set({
+                    fullName,
+                    username,
+                    email,
+                    phone,
+                    accessCodeUsed: accessCode,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'admin',
+                    uid: user.uid
+                });
+
+                console.log('✅ Admin registered:', user.uid);
+                return user;
+            }
+
+            // ========== FORM SUBMIT HANDLER ==========
+            signupForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Client-side validation
+                const valid = validateFullName() & validateUsername() & validateEmail() &
+                               validatePhone() & validateAccessCode() & validatePassword() &
+                               validateConfirmPassword() & validateTerms();
+                if (!valid) {
+                    showToast('Please fix all errors before submitting.', 'error', 3500);
+                    const firstErr = document.querySelector('.input-error');
+                    if (firstErr) { firstErr.scrollIntoView({behavior:'smooth', block:'center'}); firstErr.focus(); }
+                    return;
+                }
+
+                // Show loading
+                btnSubmit.classList.add('loading');
+                btnSubmit.disabled = true;
+
+                const formData = {
+                    fullName: fields.fullName.value.trim(),
+                    username: fields.username.value.trim(),
+                    email: fields.email.value.trim(),
+                    phone: fields.phone.value.trim(),
+                    accessCode: fields.accessCode.value.trim(),
+                    password: fields.password.value
+                };
+
+                try {
+                    await performFirebaseRegistration(formData);
+                    // Success: show modal and auto-redirect after 2.5 seconds
+                    successOverlay.classList.add('active');
+                    showToast('Account created successfully! Redirecting…', 'success', 2500);
+                    
+                    // Auto redirect to dashboard after a short delay
+                    const redirectTimer = setTimeout(() => {
+                        window.location.href = 'admindashboard.html'; // 👈 Replace with your dashboard URL
+                    }, 2500);
+
+                    // If the user clicks the button before the timeout, redirect immediately
+                    btnCloseModal.onclick = function() {
+                        clearTimeout(redirectTimer);
+                        window.location.href = 'admindashboard.html'; // 👈 Replace with your dashboard URL
+                    };
+
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    let message = 'Registration failed. Please try again.';
+                    if (error.code === 'auth/email-already-in-use') {
+                        message = 'This email is already registered.';
+                        showFieldError('email', message);
+                    } else if (error.code === 'auth/weak-password') {
+                        message = 'Password is too weak.';
+                        showFieldError('password', message);
+                    } else if (error.message) {
+                        message = error.message;
+                    }
+                    showToast(message, 'error', 6000);
+                } finally {
+                    btnSubmit.classList.remove('loading');
+                    btnSubmit.disabled = false;
+                }
+            });
+
+            // Close modal behavior (backdrop click / Escape key also redirect)
+            successOverlay.addEventListener('click', function(e) {
+                if (e.target === successOverlay) {
+                    window.location.href = 'admindashboard.html'; // 👈 Replace with your dashboard URL
+                }
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && successOverlay.classList.contains('active')) {
+                    window.location.href = 'admindashboard.html'; // 👈 Replace with your dashboard URL
+                }
+            });
+
+            // Initial focus
+            setTimeout(()=> fields.fullName.focus({preventScroll:false}), 600);
+
+            console.log('🚗 Jerry Autos Firebase Admin Ready');
+        })();
+    </script>
+</body>
+</html>

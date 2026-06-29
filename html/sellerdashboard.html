@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry Autos - Seller Dashboard</title>
+    <meta name="description" content="Premium Vehicle Marketplace Seller Dashboard">
+
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app":     "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+          "firebase/auth":    "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+          "firebase/firestore":"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+          "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"
+        }
+      }
+    </script>
+
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.5);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --sidebar-width: 260px;
+            --topbar-height: 70px;
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0f172a;
+            --bg-glass: rgba(30, 41, 59, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        body { background-color: var(--bg-main); color: var(--text-main); transition: var(--transition); overflow-x: hidden; }
+
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--card-shadow);
+        }
+
+        .app-container { display: flex; min-height: 100vh; }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            padding: 1.5rem;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .sidebar-header h2 { color: var(--primary); font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+        .mobile-close { display: none; background: none; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer; }
+
+        /* ── Sidebar profile card ── */
+        .sidebar-profile {
+            display: flex; align-items: center; gap: 0.875rem;
+            padding: 0.875rem 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 12px;
+            background: rgba(37,99,235,0.08);
+            border: 1px solid rgba(37,99,235,0.15);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .sidebar-profile:hover { background: rgba(37,99,235,0.14); }
+
+        .sidebar-profile-avatar-wrap { position: relative; flex-shrink: 0; }
+        .sidebar-avatar-img {
+            width: 44px; height: 44px; border-radius: 50%;
+            object-fit: cover; display: block;
+            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+        }
+        /* Animated ring while auth is resolving */
+        .sidebar-avatar-ring {
+            position: absolute; inset: -3px; border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        .sidebar-avatar-ring.hidden { display: none; }
+
+        .sidebar-profile-info { overflow: hidden; }
+        .sidebar-profile-name {
+            font-size: 0.875rem; font-weight: 700;
+            color: var(--text-main);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        .sidebar-profile-role {
+            font-size: 0.7rem; color: var(--primary);
+            font-weight: 600; margin-top: 1px;
+            text-transform: uppercase; letter-spacing: 0.04em;
+        }
+
+        /* Topbar avatar shimmer while auth resolves */
+        .avatar-img.loading {
+            background: linear-gradient(90deg, #cbd5e1 25%, #e2e8f0 50%, #cbd5e1 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite, spin 0s; /* override spin */
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+        .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .nav-item {
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+        .nav-item.danger:hover { background: var(--danger); }
+        .nav-divider { height: 1px; background: var(--border-glass); margin: 1rem 0; }
+        .badge { margin-left: auto; background: var(--danger); color: white; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.75rem; }
+
+        /* ── Topbar ── */
+        .topbar {
+            height: var(--topbar-height);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-left, .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
+        .mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; }
+
+        .search-bar input {
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-glass);
+            background: var(--bg-glass);
+            color: var(--text-main);
+            width: 300px;
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-bar input:focus { border-color: var(--primary); }
+
+        .icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; position: relative; color: var(--text-main); }
+        .dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; }
+
+        .profile-dropdown { display: flex; align-items: center; gap: 0.75rem; font-weight: 500; cursor: pointer; }
+
+        /* Real avatar image — replaces the old gradient div */
+        .avatar-img {
+            width: 38px; height: 38px; border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, var(--primary), #8b5cf6); /* shows while loading */
+            flex-shrink: 0;
+        }
+
+        /* ── Settings view ── */
+        .settings-card { padding: 2rem; border-radius: var(--radius); max-width: 560px; }
+        .settings-avatar-area { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
+        .settings-avatar-preview {
+            width: 88px; height: 88px; border-radius: 50%;
+            object-fit: cover; border: 3px solid var(--primary);
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            flex-shrink: 0;
+        }
+        .settings-avatar-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+        .settings-avatar-actions p { font-size: 0.75rem; color: var(--text-muted); }
+
+        .settings-form { display: flex; flex-direction: column; gap: 1.25rem; }
+        .settings-form .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .settings-form label { font-size: 0.875rem; font-weight: 500; color: var(--text-muted); }
+
+        .upload-progress {
+            height: 4px; border-radius: 2px;
+            background: var(--border-glass);
+            overflow: hidden; margin-top: 0.5rem; display: none;
+        }
+        .upload-progress-bar {
+            height: 100%; width: 0%;
+            background: var(--primary);
+            transition: width 0.2s ease;
+        }
+
+        /* ── Views ── */
+        .views-container { padding: 2rem; flex: 1; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .header-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+
+        /* ── Stats ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { padding: 1.5rem; border-radius: var(--radius); display: flex; align-items: center; gap: 1rem; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-icon { font-size: 2.5rem; color: var(--primary); }
+        .stat-details h3 { font-size: 0.875rem; color: var(--text-muted); font-weight: 500; }
+        .stat-details p { font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem; }
+
+        .dashboard-charts { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        .chart-card, .recent-activity { padding: 1.5rem; border-radius: var(--radius); }
+        .activity-list { list-style: none; margin-top: 1rem; }
+        .activity-list li { padding: 0.75rem 0; border-bottom: 1px solid var(--border-glass); font-size: 0.875rem; }
+
+        /* ── Forms ── */
+        .form-container { padding: 2rem; border-radius: var(--radius); max-width: 800px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        label { font-size: 0.875rem; font-weight: 500; color: var(--text-muted); }
+
+        .glass-input {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+        .glass-input:focus { border-color: var(--primary); outline: none; background: rgba(255,255,255,0.1); }
+        select.glass-input { background-color: var(--bg-glass); cursor: pointer; }
+        select.glass-input option { background-color: var(--bg-main); color: var(--text-main); }
+
+        .form-actions { margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; }
+
+        /* ── Buttons ── */
+        .btn { padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: var(--transition); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--secondary); color: white; }
+
+        /* ── Inventory ── */
+        .inventory-controls { display: flex; gap: 1rem; align-items: center; }
+        .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .vehicle-card { border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+
+        .vehicle-img {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            background-color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .vehicle-info { padding: 1.25rem; }
+        .vehicle-info h3 { margin-bottom: 0.25rem; font-size: 1.1rem; }
+        .vehicle-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .price-tag { color: var(--success); font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .status-badge.active { background: rgba(16,185,129,0.15); color: var(--success); }
+        .status-badge.sold { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+        .card-actions { display: flex; gap: 0.5rem; border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: auto; }
+        .card-actions button { flex: 1; padding: 0.5rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; transition: var(--transition); }
+        .btn-edit { background: var(--warning); color: #fff; }
+        .btn-edit:hover { background: #d97706; }
+        .btn-delete { background: var(--danger); color: #fff; }
+        .btn-delete:hover { background: #dc2626; }
+
+        /* ── Loading spinner ── */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            gap: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .spinner {
+            width: 24px; height: 24px;
+            border: 3px solid var(--border-glass);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Empty state ── */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-main); }
+        .empty-state p { font-size: 0.875rem; margin-bottom: 1.5rem; }
+
+        /* ── Chat ── */
+        .chat-container { display: flex; height: 600px; border-radius: var(--radius); overflow: hidden; }
+        .chat-sidebar { width: 300px; border-right: 1px solid var(--border-glass); overflow-y: auto; }
+        .chat-item { padding: 1rem; border-bottom: 1px solid var(--border-glass); cursor: pointer; }
+        .chat-item:hover { background: rgba(0,0,0,0.05); }
+        .chat-main { flex: 1; display: flex; flex-direction: column; }
+        .chat-header { padding: 1rem; border-bottom: 1px solid var(--border-glass); font-weight: 600; }
+        .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; }
+        .chat-input-area { padding: 1rem; border-top: 1px solid var(--border-glass); display: flex; gap: 1rem; }
+        .chat-input-area input { flex: 1; }
+
+        /* ── Toasts ── */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { min-width: 250px; padding: 1rem; border-radius: 8px; color: white; font-weight: 500; animation: slide-in 0.3s forwards; box-shadow: var(--card-shadow); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+        .toast.info { background: var(--primary); }
+
+        footer { padding: 1.5rem 2rem; text-align: center; color: var(--text-muted); font-size: 0.875rem; border-top: 1px solid var(--border-glass); }
+        .fade-in { animation: fade-in 0.4s ease-in-out; }
+
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 992px) { .dashboard-charts { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: var(--transition); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle, .mobile-close { display: block; }
+            .search-bar input { width: 150px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .chat-container { flex-direction: column; }
+            .chat-sidebar { width: 100%; height: 200px; border-right: none; border-bottom: 1px solid var(--border-glass); }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+
+    <aside class="sidebar glass" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Jerry Autos</h2>
+            <button class="mobile-close" id="mobile-close-btn">✕</button>
+        </div>
+
+        <!-- ── Sidebar profile card ── -->
+        <div class="sidebar-profile">
+            <div class="sidebar-profile-avatar-wrap">
+                <img id="sidebar-avatar"
+                     src="https://ui-avatars.com/api/?name=...&background=2563eb&color=fff&size=120"
+                     alt="Profile photo" class="sidebar-avatar-img">
+                <span class="sidebar-avatar-ring"></span>
+            </div>
+            <div class="sidebar-profile-info">
+                <p class="sidebar-profile-name" id="sidebar-name">Loading…</p>
+                <p class="sidebar-profile-role">Verified Seller</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a class="nav-item active" data-target="dashboard"><span>🏠</span> Dashboard</a>
+            <a class="nav-item" data-target="inventory"><span>🚗</span> Inventory</a>
+            <a class="nav-item" data-target="add-vehicle"><span>➕</span> Add Vehicle</a>
+            <a class="nav-item" data-target="messages"><span>💬</span> Messages <span class="badge">3</span></a>
+            <a class="nav-item" data-target="analytics"><span>📈</span> Analytics</a>
+            <a class="nav-item" data-target="settings"><span>⚙️</span> Settings</a>
+            <div class="nav-divider"></div>
+            <a class="nav-item danger" id="logout-btn"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar glass">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobile-toggle-btn">☰</button>
+                <div class="search-bar">
+                    <input type="text" id="global-search" placeholder="Search vehicles..." aria-label="Search">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn" id="theme-toggle">🌙</button>
+                <div class="profile-dropdown" id="profile-btn">
+                    <img id="topbar-avatar" class="avatar-img loading"
+                         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                         alt="Profile photo">
+                    <span id="user-greeting">Connecting… ⌛</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="views-container">
+
+            <!-- Dashboard -->
+            <section id="view-dashboard" class="view active fade-in">
+                <div class="header-action">
+                    <h1>Dashboard Overview</h1>
+                    <button class="btn btn-primary" id="new-listing-btn">+ New Listing</button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card glass">
+                        <div class="stat-icon">🚗</div>
+                        <div class="stat-details"><h3>My Listings</h3><p id="stat-total">—</p></div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="color:var(--success)">✅</div>
+                        <div class="stat-details"><h3>Available</h3><p id="stat-available">—</p></div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="color:var(--warning)">🏷️</div>
+                        <div class="stat-details"><h3>Sold</h3><p id="stat-sold">—</p></div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="color:var(--primary)">💰</div>
+                        <div class="stat-details"><h3>Total Value</h3><p id="stat-value">—</p></div>
+                    </div>
+                </div>
+                <div class="dashboard-charts">
+                    <div class="chart-card glass">
+                        <h2 style="margin-bottom:1rem">Recent Listings</h2>
+                        <div id="recent-listings-list"></div>
+                    </div>
+                    <div class="recent-activity glass">
+                        <h2>Quick Actions</h2>
+                        <ul class="activity-list">
+                            <li><a class="nav-item" data-target="add-vehicle" style="padding:0;color:var(--primary)">➕ Add new vehicle</a></li>
+                            <li><a class="nav-item" data-target="inventory" style="padding:0;color:var(--primary)">📋 View my inventory</a></li>
+                            <li><a class="nav-item" data-target="messages" style="padding:0;color:var(--primary)">💬 Check messages</a></li>
+                            <li><a class="nav-item" data-target="analytics" style="padding:0;color:var(--primary)">📈 View analytics</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory -->
+            <section id="view-inventory" class="view fade-in">
+                <div class="header-action">
+                    <h1>My Inventory</h1>
+                    <div class="inventory-controls">
+                        <select id="filter-status" class="glass-input">
+                            <option value="all">All Status</option>
+                            <option value="Available">Available</option>
+                            <option value="Sold">Sold</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="inventory-grid" id="inventory-grid"></div>
+            </section>
+
+            <!-- Add / Edit Vehicle -->
+            <section id="view-add-vehicle" class="view fade-in">
+                <div class="header-action">
+                    <h1 id="form-view-title">Add New Vehicle</h1>
+                </div>
+                <div class="form-container glass">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f-make">Make *</label>
+                            <input type="text" id="f-make" class="glass-input" placeholder="e.g., Toyota">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-model">Model *</label>
+                            <input type="text" id="f-model" class="glass-input" placeholder="e.g., Camry">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-year">Year *</label>
+                            <input type="number" id="f-year" class="glass-input" placeholder="e.g., 2023" min="1990" max="2030">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-price">Price (₦) *</label>
+                            <input type="number" id="f-price" class="glass-input" placeholder="e.g., 12000000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-mileage">Mileage (km)</label>
+                            <input type="number" id="f-mileage" class="glass-input" placeholder="e.g., 45000" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-transmission">Transmission *</label>
+                            <select id="f-transmission" class="glass-input">
+                                <option value="" disabled selected>Select…</option>
+                                <option value="Automatic">Automatic</option>
+                                <option value="Manual">Manual</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="f-fuel">Fuel Type *</label>
+                            <select id="f-fuel" class="glass-input">
+                                <option value="" disabled selected>Select…</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Electric">Electric</option>
+                                <option value="Hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="f-status">Status *</label>
+                            <select id="f-status" class="glass-input">
+                                <option value="Available">Available</option>
+                                <option value="Sold">Sold</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1">
+                            <label for="f-image">Vehicle Image URL</label>
+                            <input type="url" id="f-image" class="glass-input" placeholder="https://example.com/car.jpg">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-btn" style="display:none">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="submit-form-btn">Post Vehicle</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages -->
+            <section id="view-messages" class="view fade-in">
+                <div class="header-action">
+                    <h1>Message Center</h1>
+                    <a href="chat.html?role=seller" class="btn btn-primary" style="text-decoration:none">
+                        💬 Open Full Chat
+                    </a>
+                </div>
+                <p id="seller-msg-count" style="margin-bottom:1rem;font-size:.875rem;color:var(--text-muted)"></p>
+                <div id="seller-thread-list" style="display:flex;flex-direction:column;gap:12px">
+                    <div style="text-align:center;padding:40px;color:var(--text-muted)">
+                        <div style="font-size:2rem;margin-bottom:8px;animation:spin .8s linear infinite;display:inline-block">⏳</div>
+                        <p>Loading conversations…</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics -->
+            <section id="view-analytics" class="view fade-in">
+                <div class="header-action">
+                    <h1>Analytics</h1>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card glass">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-details"><h3>Total Listings</h3><p id="a-total">—</p></div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="color:var(--success)">💰</div>
+                        <div class="stat-details"><h3>Inventory Value</h3><p id="a-value">—</p></div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="color:var(--warning)">📅</div>
+                        <div class="stat-details"><h3>Avg. Price</h3><p id="a-avg">—</p></div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="color:var(--danger)">🚗</div>
+                        <div class="stat-details"><h3>Sold Units</h3><p id="a-sold">—</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings / Profile -->
+            <section id="view-settings" class="view fade-in">
+                <div class="header-action">
+                    <h1>Account Settings</h1>
+                </div>
+
+                <div class="settings-card glass">
+                    <!-- Photo area -->
+                    <div class="settings-avatar-area">
+                        <img id="settings-avatar" class="settings-avatar-preview"
+                             src="https://ui-avatars.com/api/?name=Seller&background=2563eb&color=fff&size=180"
+                             alt="Profile photo">
+                        <div class="settings-avatar-actions">
+                            <input type="file" id="photo-file-input" accept="image/jpeg,image/png,image/webp" style="display:none">
+                            <button class="btn btn-primary" id="change-photo-btn">📷 Change Photo</button>
+                            <p>JPEG, PNG or WebP · Max 4 MB</p>
+                            <p id="photo-status" style="color:var(--primary);font-weight:500;display:none"></p>
+                        </div>
+                    </div>
+
+                    <div class="upload-progress" id="upload-progress">
+                        <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                    </div>
+
+                    <!-- Profile form -->
+                    <div class="settings-form" style="margin-top:1.5rem">
+                        <div class="form-group">
+                            <label for="settings-name">Display Name</label>
+                            <input type="text" id="settings-name" class="glass-input" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="settings-email" class="glass-input" disabled
+                                   style="opacity:.55;cursor:not-allowed" placeholder="—">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-phone">Phone Number</label>
+                            <input type="tel" id="settings-phone" class="glass-input" placeholder="+234 800 000 0000">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-city">City / State</label>
+                            <input type="text" id="settings-city" class="glass-input" placeholder="Lagos, Nigeria">
+                        </div>
+                        <div style="display:flex;gap:1rem;justify-content:flex-end;margin-top:.5rem">
+                            <button class="btn btn-primary" id="save-profile-btn">💾 Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+            <p>&copy; 2026 Jerry Autos. All Rights Reserved. | Premium Vehicle Marketplace</p>
+        </footer>
+    </main>
+</div>
+
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN APPLICATION SCRIPT
+     ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp }                           from "firebase/app";
+import { getAuth, onAuthStateChanged, signOut,
+         updateProfile as fbUpdateProfile }        from "firebase/auth";
+import { getFirestore, doc, getDoc, setDoc,
+         collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { getStorage, ref as storageRef,
+         uploadBytesResumable, getDownloadURL }    from "firebase/storage";
+
+/* ── Firebase config ── */
+const firebaseConfig = {
+    apiKey:            "AIzaSyD6ZVDHScoK2DnL-vI4WcqSqXA8bLO4Ua4",
+    authDomain:        "myblog-508d5.firebaseapp.com",
+    databaseURL:       "https://myblog-508d5-default-rtdb.firebaseio.com",
+    projectId:         "myblog-508d5",
+    storageBucket:     "myblog-508d5.firebasestorage.app",
+    messagingSenderId: "521781823289",
+    appId:             "1:521781823289:web:c6dea9369689a844548ae8"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth        = getAuth(firebaseApp);
+const db          = getFirestore(firebaseApp);
+const storage     = getStorage(firebaseApp);
+
+/* ══════════════════════════════════════════════════════════════
+   HELPERS — generate initials avatar URL
+   ══════════════════════════════════════════════════════════════ */
+function avatarUrl(name) {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Seller')}&background=2563eb&color=fff&size=180`;
+}
+
+/* ════════════════════════════════════════════════════
+   SELLER THREAD PREVIEW
+   Reads chats where this seller is a participant and
+   renders a clickable list → chat.html?role=seller
+   ════════════════════════════════════════════════════ */
+let _unsubSellerThreads = null;
+
+function subscribeSellerThreads(sellerUid) {
+    if (_unsubSellerThreads) _unsubSellerThreads();
+
+    const q = query(
+        collection(db, 'chats'),
+        where('participants', 'array-contains', sellerUid),
+        orderBy('updatedAt', 'desc')
+    );
+
+    _unsubSellerThreads = onSnapshot(q, (snap) => {
+        const threads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderSellerThreads(threads);
+        /* Update messages badge in sidebar */
+        const totalUnread = threads.reduce((s, t) => s + (t.unreadSeller || 0), 0);
+        const badge = document.querySelector('.nav-item[data-target="messages"] .badge');
+        if (badge) badge.textContent = totalUnread > 0 ? totalUnread : '';
+        if (badge) badge.style.display = totalUnread > 0 ? '' : 'none';
+    }, () => {
+        const el = document.getElementById('seller-thread-list');
+        if (el) el.innerHTML = `<p style="color:var(--text-muted);font-size:.875rem;text-align:center;padding:20px">Open Full Chat to see your messages.</p>`;
+    });
+}
+
+function fmtSellerTime(ts) {
+    if (!ts) return '';
+    const d   = ts.toDate ? ts.toDate() : new Date(ts);
+    const now  = new Date();
+    const diff = Math.floor((now - d) / 86400000);
+    if (diff === 0) return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    if (diff === 1) return 'Yesterday';
+    return d.toLocaleDateString([], { month:'short', day:'numeric' });
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = String(s ?? ''); return d.innerHTML; }
+
+function renderSellerThreads(threads) {
+    const container = document.getElementById('seller-thread-list');
+    const countEl   = document.getElementById('seller-msg-count');
+    if (!container) return;
+
+    const totalUnread = threads.reduce((s, t) => s + (t.unreadSeller || 0), 0);
+    if (countEl) countEl.textContent = totalUnread > 0
+        ? `${totalUnread} unread message${totalUnread !== 1 ? 's' : ''}`
+        : `${threads.length} conversation${threads.length !== 1 ? 's' : ''}`;
+
+    if (threads.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">💬</div>
+                <h3>No messages yet</h3>
+                <p>When buyers contact you about your listings, their messages will appear here.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = threads.map(t => {
+        const buyerName  = t.buyerName  || 'Buyer';
+        const buyerPhoto = t.buyerPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(buyerName)}&background=8b5cf6&color=fff&size=80`;
+        const unread     = t.unreadSeller || 0;
+        const preview    = t.lastMessage || 'No messages yet';
+        const time       = fmtSellerTime(t.updatedAt);
+
+        return `
+        <div onclick="window.location.href='chat.html?role=seller'"
+             class="glass"
+             style="display:flex;align-items:center;gap:14px;padding:14px 16px;
+                    border-radius:14px;cursor:pointer;transition:all .2s"
+             onmouseover="this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.transform='translateY(0)'">
+            <img src="${esc(buyerPhoto)}" alt="${esc(buyerName)}"
+                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(buyerName)}&background=8b5cf6&color=fff&size=80'"
+                 style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);flex-shrink:0">
+            <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(buyerName)}</div>
+                <div style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${esc(preview)}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+                <span style="font-size:.72rem;color:var(--text-muted)">${time}</span>
+                ${unread > 0 ? `<span style="background:var(--danger);color:#fff;font-size:.68rem;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px">${unread}</span>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* Stamp name + photo across ALL identity elements in one call */
+function applyUserUI(name, photoURL, email = '') {
+    const src = photoURL || avatarUrl(name);
+
+    /* ── Topbar ── */
+    const topbarAvatar = document.getElementById('topbar-avatar');
+    topbarAvatar.src = src;
+    topbarAvatar.classList.remove('loading');              // remove shimmer
+    document.getElementById('user-greeting').textContent = `Welcome, ${name} 👋`;
+
+    /* ── Sidebar profile card ── */
+    document.getElementById('sidebar-avatar').src   = src;
+    document.getElementById('sidebar-name').textContent = name;
+    /* Stop the loading ring once auth resolves */
+    const ring = document.querySelector('.sidebar-avatar-ring');
+    if (ring) ring.classList.add('hidden');
+
+    /* ── Settings form ── */
+    document.getElementById('settings-name').value  = name;
+    document.getElementById('settings-email').value = email;
+    document.getElementById('settings-avatar').src  = src;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   APP OBJECT
+   ══════════════════════════════════════════════════════════════ */
+const app = {
+
+    state: {
+        theme:            'light',
+        currentUser:      null,     // { uid, name, email, photoURL }
+        inventory:        [],
+        editingVehicleId: null,
+        currentView:      'dashboard'
+    },
+
+    dom: {},
+
+    /* ────────────────────────────
+       INIT
+    ──────────────────────────── */
+    init() {
+        this.cacheDOM();
+        this.bindEvents();
+        this.initTheme();
+        this.watchAuth();
+    },
+
+    cacheDOM() {
+        this.dom = {
+            html:         document.documentElement,
+            themeToggle:  document.getElementById('theme-toggle'),
+            greeting:     document.getElementById('user-greeting'),
+            topbarAvatar: document.getElementById('topbar-avatar'),
+            sidebar:      document.getElementById('sidebar'),
+            mobileToggle: document.getElementById('mobile-toggle-btn'),
+            mobileClose:  document.getElementById('mobile-close-btn'),
+            views:        document.querySelectorAll('.view'),
+            navItems:     document.querySelectorAll('.nav-item[data-target]'),
+            invGrid:      document.getElementById('inventory-grid'),
+            toastCont:    document.getElementById('toast-container'),
+            chatList:     document.getElementById('chat-list'),
+            filterStatus: document.getElementById('filter-status'),
+            globalSearch: document.getElementById('global-search'),
+            submitBtn:    document.getElementById('submit-form-btn'),
+            cancelBtn:    document.getElementById('cancel-edit-btn'),
+            formTitle:    document.getElementById('form-view-title'),
+        };
+    },
+
+    bindEvents() {
+        this.dom.themeToggle.addEventListener('click', () => this.toggleTheme());
+        this.dom.mobileToggle.addEventListener('click', () => this.dom.sidebar.classList.add('open'));
+        this.dom.mobileClose.addEventListener('click',  () => this.dom.sidebar.classList.remove('open'));
+
+        /* Nav */
+        this.dom.navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.navigate(item.getAttribute('data-target'));
+            });
+        });
+
+        /* Topbar avatar → settings shortcut */
+        document.getElementById('profile-btn').addEventListener('click', () => this.navigate('settings'));
+
+        /* Sidebar profile card → settings shortcut */
+        document.querySelector('.sidebar-profile').addEventListener('click', () => this.navigate('settings'));
+
+        /* Logout */
+        document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+
+        /* New listing */
+        document.getElementById('new-listing-btn').addEventListener('click', () => this.navigate('add-vehicle'));
+
+        /* Vehicle form */
+        this.dom.submitBtn.addEventListener('click', () => this.handleFormSubmit());
+        this.dom.cancelBtn.addEventListener('click', () => this.resetVehicleForm());
+
+        /* Inventory filter + search */
+        this.dom.filterStatus.addEventListener('change', () => this.renderInventory());
+        this.dom.globalSearch.addEventListener('input', (e) => {
+            if (this.state.currentView === 'inventory') this.renderInventory(e.target.value);
+        });
+
+        /* Chat */
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatInput   = document.getElementById('chat-input');
+        if (chatSendBtn && chatInput) {
+            chatSendBtn.addEventListener('click', () => {
+                this.sendChatMessage(chatInput.value);
+                chatInput.value = '';
+            });
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { this.sendChatMessage(e.target.value); e.target.value = ''; }
+            });
+        }
+
+        /* ── Settings: photo upload ── */
+        document.getElementById('change-photo-btn').addEventListener('click', () => {
+            document.getElementById('photo-file-input').click();
+        });
+
+        document.getElementById('photo-file-input').addEventListener('change', (e) => {
+            this.handlePhotoUpload(e.target.files[0]);
+            e.target.value = ''; // reset so same file can be re-picked
+        });
+
+        /* ── Settings: save profile ── */
+        document.getElementById('save-profile-btn').addEventListener('click', () => this.saveProfile());
+    },
+
+    /* ────────────────────────────
+       AUTH WATCHER
+       Source of truth: Firebase Auth user object.
+       Firestore sellers/{uid} is checked for extra fields (phone, city).
+       Only navigates to dashboard on FIRST sign-in, not on every
+       token refresh (which would disrupt the user mid-session).
+    ──────────────────────────── */
+    watchAuth() {
+        let firstCall = true;
+
+        onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                let name  = firebaseUser.displayName || '';
+                let phone = '';
+                let city  = '';
+
+                try {
+                    const snap = await getDoc(doc(db, 'sellers', firebaseUser.uid));
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (!name && data.username) name = data.username;
+                        phone = data.phone || '';
+                        city  = data.city  || '';
+                    }
+                } catch (_) { /* swallow — use Auth fallbacks */ }
+
+                if (!name) name = firebaseUser.email?.split('@')[0] || 'Seller';
+
+                this.state.currentUser = {
+                    uid:      firebaseUser.uid,
+                    name,
+                    email:    firebaseUser.email || '',
+                    photoURL: firebaseUser.photoURL || null,
+                    phone,
+                    city,
+                };
+
+                /* Stamp ALL identity UI in one call */
+                applyUserUI(name, firebaseUser.photoURL, firebaseUser.email);
+
+                /* Pre-fill extra settings fields */
+                document.getElementById('settings-phone').value = phone;
+                document.getElementById('settings-city').value  = city;
+
+                if (firstCall) {
+                    this.showToast(`Welcome back, ${name}! 👋`, 'success');
+                    await this.loadInventory();
+                    this.navigate('dashboard');
+                    firstCall = false;
+                    subscribeSellerThreads(firebaseUser.uid);
+                }
+
+            } else {
+                this.state.currentUser = null;
+                firstCall = true; // reset so next sign-in triggers navigate
+
+                /* Clear all identity UI */
+                const placeholder = avatarUrl('?');
+                document.getElementById('topbar-avatar').src           = placeholder;
+                document.getElementById('topbar-avatar').classList.remove('loading');
+                document.getElementById('sidebar-avatar').src          = placeholder;
+                document.getElementById('sidebar-name').textContent    = 'Not signed in';
+                document.getElementById('user-greeting').textContent   = 'Not signed in';
+                document.getElementById('settings-avatar').src         = placeholder;
+                document.getElementById('settings-name').value         = '';
+                document.getElementById('settings-email').value        = '';
+                document.getElementById('settings-phone').value        = '';
+                document.getElementById('settings-city').value         = '';
+                const ring = document.querySelector('.sidebar-avatar-ring');
+                if (ring) ring.classList.add('hidden');
+
+                this.showToast('No active session.', 'warning');
+                /* window.location.href = '/login.html'; */
+                this.navigate('dashboard');
+            }
+        });
+    },
+
+    /* ────────────────────────────
+       SAVE PROFILE
+       Writes displayName back to Firebase Auth, then saves all
+       extra fields (phone, city) to Firestore sellers/{uid}.
+    ──────────────────────────── */
+    async saveProfile() {
+        const user = auth.currentUser;
+        if (!user) { this.showToast('Not signed in.', 'error'); return; }
+
+        const name  = document.getElementById('settings-name').value.trim();
+        const phone = document.getElementById('settings-phone').value.trim();
+        const city  = document.getElementById('settings-city').value.trim();
+
+        if (!name) { this.showToast('Name cannot be empty.', 'warning'); return; }
+
+        const btn = document.getElementById('save-profile-btn');
+        btn.disabled    = true;
+        btn.textContent = 'Saving…';
+
+        try {
+            /* 1. Update Firebase Auth displayName */
+            await fbUpdateProfile(user, { displayName: name });
+
+            /* 2. Merge extra fields into Firestore sellers/{uid} */
+            await setDoc(doc(db, 'sellers', user.uid), {
+                username: name,
+                phone,
+                city,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+
+            /* 3. Update local state */
+            this.state.currentUser = {
+                ...this.state.currentUser,
+                name, phone, city,
+                photoURL: user.photoURL
+            };
+
+            /* 4. Refresh ALL UI identity elements at once */
+            applyUserUI(name, user.photoURL, user.email);
+            document.getElementById('sidebar-name').textContent = name;
+
+            this.showToast('Profile saved successfully!', 'success');
+        } catch (err) {
+            console.error('saveProfile error:', err);
+            this.showToast('Failed to save profile. Try again.', 'error');
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '💾 Save Changes';
+        }
+    },
+
+    /* ────────────────────────────
+       PHOTO UPLOAD
+       Validates → local preview → Firebase Storage upload
+       → getDownloadURL → updateProfile(photoURL) → stamp UI
+    ──────────────────────────── */
+    async handlePhotoUpload(file) {
+        if (!file) return;
+        const user = auth.currentUser;
+        if (!user) { this.showToast('Not signed in.', 'error'); return; }
+
+        if (file.size > 4 * 1024 * 1024) {
+            this.showToast('File too large. Max size is 4 MB.', 'error');
+            return;
+        }
+
+        const statusEl    = document.getElementById('photo-status');
+        const progressEl  = document.getElementById('upload-progress');
+        const progressBar = document.getElementById('upload-progress-bar');
+
+        /* Instant local preview */
+        const localURL = URL.createObjectURL(file);
+        document.getElementById('topbar-avatar').src   = localURL;
+        document.getElementById('settings-avatar').src  = localURL;
+        document.getElementById('sidebar-avatar').src   = localURL;
+
+        /* Show progress bar */
+        progressEl.style.display   = 'block';
+        statusEl.style.display     = 'block';
+        statusEl.textContent        = 'Uploading…';
+
+        try {
+            const fileRef = storageRef(storage, `sellers/${user.uid}/avatar`);
+            const task    = uploadBytesResumable(fileRef, file);
+
+            task.on('state_changed',
+                (snap) => {
+                    const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+                    progressBar.style.width = pct + '%';
+                    statusEl.textContent    = `Uploading… ${pct}%`;
+                },
+                (err) => {
+                    console.error('Upload error:', err);
+                    this.showToast('Upload failed. Check Firebase Storage rules.', 'error');
+                    progressEl.style.display = 'none';
+                    statusEl.style.display   = 'none';
+                    URL.revokeObjectURL(localURL);
+                },
+                async () => {
+                    /* Upload complete */
+                    const downloadURL = await getDownloadURL(task.snapshot.ref);
+
+                    /* Save to Firebase Auth profile */
+                    await fbUpdateProfile(user, { photoURL: downloadURL });
+
+                    /* Also persist to Firestore */
+                    await setDoc(doc(db, 'sellers', user.uid), {
+                        photoURL: downloadURL
+                    }, { merge: true });
+
+                    /* Stamp permanent URL everywhere */
+                    document.getElementById('topbar-avatar').src   = downloadURL;
+                    document.getElementById('settings-avatar').src  = downloadURL;
+                    document.getElementById('sidebar-avatar').src   = downloadURL;
+                    if (this.state.currentUser) this.state.currentUser.photoURL = downloadURL;
+
+                    URL.revokeObjectURL(localURL);
+                    progressBar.style.width  = '0%';
+                    progressEl.style.display = 'none';
+                    statusEl.textContent     = '✅ Photo updated!';
+                    setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+                    this.showToast('Profile photo updated!', 'success');
+                }
+            );
+        } catch (err) {
+            console.error('handlePhotoUpload error:', err);
+            this.showToast('Photo upload failed.', 'error');
+            progressEl.style.display = 'none';
+            statusEl.style.display   = 'none';
+        }
+    },
+
+    /* ────────────────────────────
+       NAVIGATION
+    ──────────────────────────── */
+    navigate(target) {
+        if (!target) target = 'dashboard';
+        if (target !== 'add-vehicle' && this.state.editingVehicleId) this.resetVehicleForm();
+
+        this.dom.views.forEach(v => v.classList.remove('active'));
+        this.dom.navItems.forEach(n => n.classList.remove('active'));
+
+        const targetView = document.getElementById(`view-${target}`);
+        if (targetView) {
+            targetView.classList.add('active');
+            const activeNav = document.querySelector(`.nav-item[data-target="${target}"]`);
+            if (activeNav) activeNav.classList.add('active');
+        }
+
+        this.state.currentView = target;
+        this.dom.sidebar.classList.remove('open');
+        this.onViewEnter(target);
+    },
+
+    onViewEnter(view) {
+        if (view === 'inventory')  this.renderInventory();
+        if (view === 'dashboard')  this.renderDashboard();
+        if (view === 'analytics')  this.renderAnalytics();
+        if (view === 'messages')   this.renderDummyChats();
+        if (view === 'settings')   this.onSettingsEnter();
+    },
+
+    /* Re-sync settings form with latest state when view opens */
+    onSettingsEnter() {
+        const u = this.state.currentUser;
+        if (!u) return;
+        document.getElementById('settings-name').value  = u.name  || '';
+        document.getElementById('settings-email').value = u.email || '';
+        document.getElementById('settings-phone').value = u.phone || '';
+        document.getElementById('settings-city').value  = u.city  || '';
+        document.getElementById('settings-avatar').src  = u.photoURL || avatarUrl(u.name);
+    },
+
+    /* ────────────────────────────
+       EXPRESS API — BASE URL
+    ──────────────────────────── */
+    API: 'http://localhost:5000/api',
+
+    /* ────────────────────────────
+       EXPRESS API — INVENTORY
+    ──────────────────────────── */
+    async loadInventory() {
+        if (!this.state.currentUser) { this.state.inventory = []; return; }
+        try {
+            const res = await fetch(`${this.API}/vehicles?sellerId=${this.state.currentUser.uid}`);
+            if (!res.ok) throw new Error(`Server ${res.status}`);
+            const data = await res.json();
+            this.state.inventory = data.map(v => ({ ...v, id: v.id || v._id }));
+        } catch (err) {
+            console.error('loadInventory error:', err);
+            this.showToast('Could not reach server — showing cached data.', 'warning');
+        }
+    },
+
+    async addVehicle(data) {
+        const payload = { ...data, sellerId: this.state.currentUser.uid };
+        const res = await fetch(`${this.API}/vehicles`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || res.status); }
+        const { vehicle } = await res.json();
+        this.state.inventory.push({ ...vehicle, id: vehicle.id || vehicle._id });
+        this.showToast('Vehicle listed!', 'success');
+    },
+
+    async updateVehicle(id, data) {
+        const res = await fetch(`${this.API}/vehicles/${id}`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, sellerId: this.state.currentUser.uid })
+        });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || res.status); }
+        const { vehicle } = await res.json();
+        const idx = this.state.inventory.findIndex(v => v.id === id);
+        if (idx !== -1) this.state.inventory[idx] = { ...vehicle, id: vehicle.id || vehicle._id };
+        this.showToast('Vehicle updated!', 'success');
+    },
+
+    async deleteVehicle(id) {
+        if (!confirm('Remove this vehicle from your listings?')) return;
+        const vehicle = this.state.inventory.find(v => v.id === id);
+        if (!vehicle) return;
+        if (vehicle.sellerId !== this.state.currentUser.uid) {
+            this.showToast('Permission denied.', 'error'); return;
+        }
+        try {
+            const res = await fetch(`${this.API}/vehicles/${id}?sellerId=${this.state.currentUser.uid}`, { method: 'DELETE' });
+            if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || res.status); }
+            this.state.inventory = this.state.inventory.filter(v => v.id !== id);
+            this.renderInventory();
+            this.renderDashboard();
+            this.showToast('Vehicle removed.', 'success');
+        } catch (err) {
+            this.showToast(`Delete failed: ${err.message}`, 'error');
+        }
+    },
+
+    editVehicle(id) {
+        const car = this.state.inventory.find(v => v.id === id);
+        if (!car) return;
+        this.state.editingVehicleId = id;
+        document.getElementById('f-make').value         = car.make         || '';
+        document.getElementById('f-model').value        = car.model        || '';
+        document.getElementById('f-year').value         = car.year         || '';
+        document.getElementById('f-price').value        = car.price        || '';
+        document.getElementById('f-mileage').value      = car.mileage      || '';
+        document.getElementById('f-transmission').value = car.transmission || '';
+        document.getElementById('f-fuel').value         = car.fuelType     || '';
+        document.getElementById('f-status').value       = car.status       || 'Available';
+        document.getElementById('f-image').value        = car.image        || '';
+        this.dom.formTitle.textContent   = 'Edit Vehicle';
+        this.dom.submitBtn.textContent   = 'Save Changes';
+        this.dom.cancelBtn.style.display = 'inline-block';
+        this.navigate('add-vehicle');
+    },
+
+    resetVehicleForm() {
+        this.state.editingVehicleId = null;
+        ['f-make','f-model','f-year','f-price','f-mileage','f-image'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('f-transmission').value = '';
+        document.getElementById('f-fuel').value         = '';
+        document.getElementById('f-status').value       = 'Available';
+        this.dom.formTitle.textContent    = 'Add New Vehicle';
+        this.dom.submitBtn.textContent    = 'Post Vehicle';
+        this.dom.cancelBtn.style.display  = 'none';
+    },
+
+    async handleFormSubmit() {
+        if (!this.state.currentUser) { this.showToast('Must be signed in.', 'error'); return; }
+        const make         = document.getElementById('f-make').value.trim();
+        const model        = document.getElementById('f-model').value.trim();
+        const year         = parseInt(document.getElementById('f-year').value);
+        const price        = parseFloat(document.getElementById('f-price').value);
+        const mileage      = parseInt(document.getElementById('f-mileage').value) || 0;
+        const transmission = document.getElementById('f-transmission').value;
+        const fuelType     = document.getElementById('f-fuel').value;
+        const status       = document.getElementById('f-status').value;
+        const image        = document.getElementById('f-image').value.trim();
+        if (!make || !model || !year || !price || !transmission || !fuelType) {
+            this.showToast('Fill in all required fields.', 'warning'); return;
+        }
+        const data = { make, model, year, price, mileage, transmission, fuelType, status, image };
+        this.dom.submitBtn.disabled    = true;
+        this.dom.submitBtn.textContent = 'Saving…';
+        try {
+            if (this.state.editingVehicleId) await this.updateVehicle(this.state.editingVehicleId, data);
+            else await this.addVehicle(data);
+            this.resetVehicleForm();
+            this.navigate('inventory');
+        } catch (err) {
+            this.showToast(`Failed: ${err.message}`, 'error');
+        } finally {
+            this.dom.submitBtn.disabled    = false;
+            this.dom.submitBtn.textContent = this.state.editingVehicleId ? 'Save Changes' : 'Post Vehicle';
+        }
+    },
+
+    /* ────────────────────────────
+       RENDER — DASHBOARD
+    ──────────────────────────── */
+    renderDashboard() {
+        const inv = this.state.inventory;
+        document.getElementById('stat-total').textContent     = inv.length;
+        document.getElementById('stat-available').textContent = inv.filter(v => (v.status || 'Available') === 'Available').length;
+        document.getElementById('stat-sold').textContent      = inv.filter(v => v.status === 'Sold').length;
+        document.getElementById('stat-value').textContent     = `₦${inv.reduce((s, v) => s + (Number(v.price) || 0), 0).toLocaleString()}`;
+        const recentEl = document.getElementById('recent-listings-list');
+        if (!recentEl) return;
+        const recent = [...inv].reverse().slice(0, 5);
+        recentEl.innerHTML = recent.length
+            ? recent.map(v => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid var(--border-glass)">
+                    <span style="font-weight:500">${v.year || ''} ${this.sanitize(v.make || '')} ${this.sanitize(v.model || '')}</span>
+                    <span style="color:var(--success);font-weight:600">₦${Number(v.price || 0).toLocaleString()}</span>
+                </div>`).join('')
+            : `<p style="color:var(--text-muted);font-size:.875rem">No listings yet.</p>`;
+    },
+
+    /* ────────────────────────────
+       RENDER — INVENTORY
+    ──────────────────────────── */
+    renderInventory(searchQuery = '') {
+        if (!this.dom.invGrid) return;
+        let list = [...this.state.inventory];
+        const statusFilter = this.dom.filterStatus.value;
+        if (statusFilter !== 'all') list = list.filter(v => v.status === statusFilter);
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase();
+            list = list.filter(v => (`${v.make} ${v.model} ${v.year}`).toLowerCase().includes(q));
+        }
+        if (list.length === 0) {
+            this.dom.invGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🚗</div>
+                    <h3>No vehicles found</h3>
+                    <p>${this.state.inventory.length === 0 ? "You haven't listed any vehicles yet." : "No vehicles match your filter."}</p>
+                    <button class="btn btn-primary" onclick="app.navigate('add-vehicle')">Add Your First Vehicle</button>
+                </div>`;
+            return;
+        }
+        this.dom.invGrid.innerHTML = list.map(v => {
+            const title   = `${v.year || ''} ${this.sanitize(v.make || '')} ${this.sanitize(v.model || '')}`.trim();
+            const price   = v.price ? `₦${Number(v.price).toLocaleString()}` : '—';
+            const mileage = v.mileage ? `${Number(v.mileage).toLocaleString()} km` : '—';
+            const isActive = (v.status || 'Available') === 'Available';
+            return `
+            <div class="vehicle-card glass">
+                <div class="vehicle-img" style="${v.image ? `background-image:url('${this.sanitize(v.image)}')` : ''}">
+                    ${v.image ? '' : '🚗'}
+                </div>
+                <div class="vehicle-info">
+                    <h3>${title || 'Unnamed Vehicle'}</h3>
+                    <div class="vehicle-meta">${v.transmission || ''} · ${v.fuelType || ''} · ${mileage}</div>
+                    <div class="price-tag">${price}</div>
+                    <span class="status-badge ${isActive ? 'active' : 'sold'}">${v.status || 'Available'}</span>
+                    <div class="card-actions">
+                        <button class="btn-edit"   data-id="${v.id}">✏️ Edit</button>
+                        <button class="btn-delete" data-id="${v.id}">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+
+        this.dom.invGrid.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', () => this.editVehicle(btn.dataset.id));
+        });
+        this.dom.invGrid.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', () => this.deleteVehicle(btn.dataset.id));
+        });
+    },
+
+    /* ────────────────────────────
+       RENDER — ANALYTICS
+    ──────────────────────────── */
+    renderAnalytics() {
+        const inv  = this.state.inventory;
+        const total    = inv.length;
+        const sold     = inv.filter(v => v.status === 'Sold').length;
+        const totalVal = inv.reduce((s, v) => s + (Number(v.price) || 0), 0);
+        const avg      = total > 0 ? Math.round(totalVal / total) : 0;
+        document.getElementById('a-total').textContent = total;
+        document.getElementById('a-value').textContent = `₦${totalVal.toLocaleString()}`;
+        document.getElementById('a-avg').textContent   = `₦${avg.toLocaleString()}`;
+        document.getElementById('a-sold').textContent  = sold;
+    },
+
+    /* ────────────────────────────
+       CHAT (placeholder)
+    ──────────────────────────── */
+    renderDummyChats() {
+        if (!this.dom.chatList) return;
+        this.dom.chatList.innerHTML = ['Chukwuemeka Obi', 'Amina Yusuf', 'Tunde Adeyemi'].map(name => `
+            <div class="chat-item"><strong>${name}</strong><br>
+            <span style="font-size:.8rem;color:var(--text-muted)">Interested in your listing</span></div>
+        `).join('');
+    },
+
+    sendChatMessage(text) {
+        if (!text.trim()) return;
+        const msgs = document.getElementById('chat-messages');
+        if (msgs) {
+            msgs.innerHTML += `
+                <div style="padding:.75rem 1rem;background:var(--primary);color:white;margin:.5rem;
+                            border-radius:8px;text-align:right;max-width:80%;margin-left:auto">
+                    ${this.sanitize(text)}
+                </div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+    },
+
+    /* ────────────────────────────
+       THEME
+    ──────────────────────────── */
+    initTheme() {
+        const saved = localStorage.getItem('jerryAutosTheme') || 'light';
+        this.state.theme = saved;
+        this.dom.html.setAttribute('data-theme', saved);
+        this.dom.themeToggle.textContent = saved === 'light' ? '🌙' : '☀️';
+    },
+
+    toggleTheme() {
+        this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+        this.dom.html.setAttribute('data-theme', this.state.theme);
+        localStorage.setItem('jerryAutosTheme', this.state.theme);
+        this.dom.themeToggle.textContent = this.state.theme === 'light' ? '🌙' : '☀️';
+    },
+
+    /* ────────────────────────────
+       LOGOUT
+    ──────────────────────────── */
+    async logout() {
+        this.showToast('Signing out…', 'info');
+        try {
+            await signOut(auth);
+            this.state.currentUser = null;
+            this.state.inventory   = [];
+            document.getElementById('user-greeting').textContent = 'Signed out';
+            document.getElementById('topbar-avatar').src = avatarUrl('?');
+            this.navigate('dashboard');
+            this.showToast('Signed out successfully.', 'success');
+        } catch (err) {
+            this.showToast('Sign-out failed. Try again.', 'error');
+        }
+    },
+
+    /* ────────────────────────────
+       UTILITIES
+    ──────────────────────────── */
+    sanitize(str) {
+        if (!str) return '';
+        const el = document.createElement('div');
+        el.textContent = String(str);
+        return el.innerHTML;
+    },
+
+    showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        this.dom.toastCont.appendChild(toast);
+        setTimeout(() => toast.remove(), 4500);
+    }
+};
+
+window.app = app;
+document.addEventListener('DOMContentLoaded', () => app.init());
+</script>
+</body>
+</html> 

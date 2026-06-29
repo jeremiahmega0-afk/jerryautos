@@ -1,0 +1,27 @@
+[
+  {
+    "origin": [
+      "http://localhost:5500",
+      "http://127.0.0.1:5500",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "http://localhost:5000",
+      "http://127.0.0.1:5000",
+      "http://localhost:8080",
+      "http://127.0.0.1:8080",
+      "https://myblog-508d5.web.app",
+      "https://myblog-508d5.firebaseapp.com"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
+    "responseHeader": [
+      "Content-Type",
+      "Access-Control-Allow-Origin",
+      "Authorization",
+      "X-Requested-With",
+      "Content-Length",
+      "Accept",
+      "Origin"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

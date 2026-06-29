@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry Autos - Buyer Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === CSS VARIABLES & THEMING === */
+        :root {
+            --bg-color: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --input-bg: rgba(255, 255, 255, 0.5);
+            --input-border: #d1d5db;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --social-btn-bg: #ffffff;
+            --social-btn-border: #e5e7eb;
+            --error: #ef4444;
+            --success: #10b981;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-color: #3b82f6;
+            --primary-hover: #60a5fa;
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: #334155;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --social-btn-bg: #1e293b;
+            --social-btn-border: #334155;
+        }
+
+        /* === RESET & BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* === LAYOUT === */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* === LEFT PANEL: HERO & FEATURES === */
+        .left-panel {
+            flex: 1.2;
+            background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .brand-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 1px;
+        }
+
+        .brand-logo i {
+            color: #3b82f6;
+        }
+
+        .welcome-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .welcome-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 80%;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .buyer-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .feature-card i {
+            font-size: 1.5rem;
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .feature-card h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        /* === RIGHT PANEL: LOGIN FORM === */
+        .right-panel {
+            flex: 1;
+            background-color: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .login-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 3rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .login-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .login-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: flex;
+        }
+
+        .alert.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            display: flex;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            padding-left: 2.8rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 2.5rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 2.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .remember-me input {
+            accent-color: var(--primary-color);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        /* Spinner Animation */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-submit.loading .spinner {
+            display: block;
+        }
+        .btn-submit.loading .btn-text {
+            display: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--input-border);
+        }
+
+        .divider:not(:empty)::before { margin-right: 1rem; }
+        .divider:not(:empty)::after { margin-left: 1rem; }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .btn-social {
+            padding: 0.7rem 0.5rem;
+            background: var(--social-btn-bg);
+            border: 1px solid var(--social-btn-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-social i {
+            font-size: 1.2rem;
+        }
+
+        .btn-social:hover {
+            background-color: var(--input-bg);
+        }
+
+        .form-footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .form-footer a {
+            margin: 0 5px;
+        }
+
+        /* === ANIMATIONS & MEDIA QUERIES === */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 1024px) {
+            .buyer-features { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .left-panel { padding: 2rem; flex: none; height: 35vh; justify-content: center; text-align: center; }
+            .buyer-features { display: none; }
+            .welcome-content p { max-width: 100%; margin: 0; }
+            .welcome-content h1 { font-size: 2.5rem; margin-top: 1rem; }
+            .right-panel { padding: 1.5rem; align-items: flex-start; padding-top: 3rem; }
+            .theme-toggle { top: 1rem; right: 1rem; }
+            .login-wrapper { padding: 2rem; }
+            .social-login { grid-template-columns: 1fr; }
+            .btn-social { flex-direction: row; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="left-panel">
+            <div class="brand-logo">
+                <i class="fa-solid fa-car-side"></i>
+                Jerry Autos
+            </div>
+            
+            <div class="welcome-content">
+                <h1>Find Your Dream Car Today.</h1>
+                <p>Sign in to unlock personalized recommendations, track your favorite vehicles, and manage your garage.</p>
+                
+                <div class="buyer-features">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <h3>Smart Recommendations</h3>
+                        <p>AI-driven vehicle matches based on your preferences.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-regular fa-heart"></i>
+                        <h3>Your Wishlist</h3>
+                        <p>Save and compare your favorite luxury vehicles.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <h3>Recently Viewed</h3>
+                        <p>Pick up exactly where you left off browsing.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <h3>Secure Purchasing</h3>
+                        <p>Verified sellers and encrypted transactions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                <i class="fa-regular fa-moon" id="themeIcon"></i>
+            </button>
+
+            <div class="login-wrapper">
+                <div class="login-header">
+                    <h2>Welcome Back, Buyer</h2>
+                    <p>Enter your details to access your account</p>
+                </div>
+
+                <div id="alertBox" class="alert">
+                    <i id="alertIcon" class="fa-solid"></i>
+                    <span id="alertMessage"></span>
+                </div>
+
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input type="email" id="email" class="form-control" placeholder="buyer@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle Password Visibility">
+                            <i class="fa-regular fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            Remember me
+                        </label>
+                        <a href="#">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span class="btn-text">Sign In Securely</span>
+                        <div class="spinner"></div>
+                    </button>
+                </form>
+
+                <div class="divider">Or continue with</div>
+
+                <div class="social-login">
+                    <button class="btn-social" id="btnGoogle" type="button">
+                        <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google
+                    </button>
+                    <button class="btn-social" id="btnFacebook" type="button">
+                        <i class="fa-brands fa-facebook" style="color: #1877F2;"></i> Facebook
+                    </button>
+                    <button class="btn-social" id="btnApple" type="button">
+                        <i class="fa-brands fa-apple"></i> Apple
+                    </button>
+                </div>
+
+                <div class="form-footer">
+                    Don't have an account? <a href="buyersignup.html">Sign up here</a> <br><br>
+                    Need help? <a href="#">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme Toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon(currentTheme);
+
+            themeToggle.addEventListener('click', () => {
+                let theme = document.documentElement.getAttribute('data-theme');
+                let newTheme = theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+
+            function updateThemeIcon(theme) {
+                if (theme === 'dark') {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            }
+
+            // Password Toggle
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                eyeIcon.classList.toggle('fa-eye');
+                eyeIcon.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+
+    <script type="module">
+        // Import Firebase core and Auth modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword,
+            signInWithPopup,
+            GoogleAuthProvider,
+            FacebookAuthProvider,
+            OAuthProvider 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // TODO: Replace with your actual Firebase Project Configuration
+        const firebaseConfig = {
+    apiKey: "AIzaSyD6ZVDHScoK2DnL-vI4WcqSqXA8bLO4Ua4",
+    authDomain: "myblog-508d5.firebaseapp.com",
+    databaseURL: "https://myblog-508d5-default-rtdb.firebaseio.com",
+    projectId: "myblog-508d5",
+    storageBucket: "myblog-508d5.firebasestorage.app",
+    messagingSenderId: "521781823289",
+    appId: "1:521781823289:web:c6dea9369689a844548ae8"
+  };
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Providers
+        const googleProvider = new GoogleAuthProvider();
+        const facebookProvider = new FacebookAuthProvider();
+        const appleProvider = new OAuthProvider('apple.com');
+
+        // UI Elements
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const alertBox = document.getElementById('alertBox');
+        const alertIcon = document.getElementById('alertIcon');
+        const alertMessage = document.getElementById('alertMessage');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        // Social Buttons
+        const btnGoogle = document.getElementById('btnGoogle');
+        const btnFacebook = document.getElementById('btnFacebook');
+        const btnApple = document.getElementById('btnApple');
+
+        // Helper function for showing alerts
+        function showAlert(type, message) {
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'flex';
+            alertMessage.textContent = message;
+            alertIcon.className = type === 'error' ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+        }
+
+        // --- Standard Email/Password Sign In ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alertBox.style.display = 'none';
+
+            if (!emailInput.value.trim() || !passwordInput.value.trim()) {
+                showAlert('error', 'Please enter both email and password.');
+                return;
+            }
+
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+                showAlert('success', `Welcome back, ${userCredential.user.email}!`);
+                 window.location.href = 'buyerdashboard.html';
+            } catch (error) {
+                showAlert('error', error.message.replace('Firebase: ', ''));
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // --- Social Login Helper ---
+        async function handleSocialLogin(provider, providerName) {
+            alertBox.style.display = 'none';
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                showAlert('success', `Signed in with ${providerName} successfully!`);
+                // window.location.href = '/dashboard';
+            } catch (error) {
+                showAlert('error', error.message.replace('Firebase: ', ''));
+            }
+        }
+
+        // --- Social Login Event Listeners ---
+        btnGoogle.addEventListener('click', () => handleSocialLogin(googleProvider, 'Google'));
+        btnFacebook.addEventListener('click', () => handleSocialLogin(facebookProvider, 'Facebook'));
+        btnApple.addEventListener('click', () => handleSocialLogin(appleProvider, 'Apple'));
+
+    </script>
+</body>
+</html>

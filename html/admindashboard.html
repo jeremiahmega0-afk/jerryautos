@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jerry Autos — Admin Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/css/admindashboard.css">
+<script type="importmap">
+{
+    "imports": {
+        "firebase/app":      "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/firestore":"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    }
+}
+</script>
+</head>
+<body data-theme="light">
+
+<!-- ============ TOAST CONTAINER ============ -->
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<!-- ============ CONFIRMATION MODAL ============ -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-card">
+    <div class="modal-icon" id="confirmIcon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h3 id="confirmTitle">Confirm action</h3>
+    <p id="confirmBody">Are you sure you want to proceed?</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
+      <button class="btn btn-danger" id="confirmAccept">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DETAIL DRAWER (profiles) ============ -->
+<div class="drawer-overlay" id="drawerOverlay">
+  <aside class="drawer" id="drawer">
+    <button class="drawer-close" id="drawerClose"><i class="fa-solid fa-xmark"></i></button>
+    <div id="drawerContent"></div>
+  </aside>
+</div>
+
+<div class="app-shell">
+
+  <!-- ============================================================
+       SIDEBAR
+  ============================================================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark"><i class="fa-solid fa-car-side"></i></div>
+      <div class="brand-text">
+        <span class="brand-name">Jerry<em>Autos</em></span>
+        <span class="brand-sub">Admin Console</span>
+      </div>
+    </div>
+
+    <button class="sidebar-collapse-btn" id="collapseBtn" aria-label="Collapse sidebar">
+      <i class="fa-solid fa-angles-left"></i>
+    </button>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <span class="nav-label">Overview</span>
+      <a href="#" class="nav-item active" data-route="dashboard">
+        <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+      </a>
+
+      <span class="nav-label">People</span>
+      <a href="#" class="nav-item" data-route="sellers">
+        <i class="fa-solid fa-store"></i><span>Manage Sellers</span>
+        <span class="nav-badge" data-badge="sellers"></span>
+      </a>
+      <a href="#" class="nav-item" data-route="buyers">
+        <i class="fa-solid fa-users"></i><span>Manage Buyers</span>
+      </a>
+
+      <span class="nav-label">Inventory</span>
+      <a href="#" class="nav-item" data-route="vehicles">
+        <i class="fa-solid fa-car"></i><span>Manage Vehicles</span>
+      </a>
+      <a href="#" class="nav-item" data-route="approvals">
+        <i class="fa-solid fa-stamp"></i><span>Pending Approvals</span>
+        <span class="nav-badge" data-badge="approvals"></span>
+      </a>
+
+      <span class="nav-label">Commerce</span>
+      <a href="#" class="nav-item" data-route="orders">
+        <i class="fa-solid fa-receipt"></i><span>Orders &amp; Transactions</span>
+      </a>
+      <a href="#" class="nav-item" data-route="reports">
+        <i class="fa-solid fa-chart-line"></i><span>Reports &amp; Analytics</span>
+      </a>
+
+      <span class="nav-label">Engagement</span>
+      <a href="#" class="nav-item" data-route="messages">
+        <i class="fa-solid fa-comments"></i><span>Messages</span>
+        <span class="nav-badge" data-badge="reports"></span>
+      </a>
+      <a href="#" class="nav-item" data-route="notifications">
+        <i class="fa-solid fa-bell"></i><span>Notifications</span>
+        <span class="nav-badge" data-badge="notifications"></span>
+      </a>
+
+      <span class="nav-label">System</span>
+      <a href="#" class="nav-item" data-route="settings">
+        <i class="fa-solid fa-gear"></i><span>Settings</span>
+      </a>
+      <a href="#" class="nav-item nav-logout" data-route="logout">
+        <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-mini-card">
+        <img src="https://ui-avatars.com/api/?name=Ajayi+Jeremiah&background=F59E0B&color=0F172A&bold=true" alt="">
+        <div>
+          <strong>Ajayi Jeremiah</strong>
+          <span>Founder &amp; Super Admin</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+  <!-- ============================================================
+       MAIN
+  ============================================================= -->
+  <div class="main-col">
+
+    <!-- ===== TOPBAR ===== -->
+    <header class="topbar">
+      <button class="icon-btn mobile-only" id="mobileMenuBtn" aria-label="Open menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="global-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="globalSearch" placeholder="Search sellers, buyers, vehicles, orders…">
+        <kbd>⌘K</kbd>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="date-range-pill" id="dateRangePill">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="dateRangeLabel">Last 30 days</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:10px"></i>
+        </div>
+
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <div class="topbar-divider"></div>
+
+        <button class="icon-btn notif-btn" id="notifBtn" aria-label="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="ping-dot" id="notifPing"></span>
+        </button>
+
+        <div class="topbar-divider"></div>
+
+        <div class="admin-chip" id="adminChip">
+          <img src="https://ui-avatars.com/api/?name=Ajayi+Jeremiah&background=F59E0B&color=0F172A&bold=true" alt="">
+          <div class="admin-chip-text">
+            <strong>Ajayi Jeremiah</strong>
+            <span>Super Admin</span>
+          </div>
+          <i class="fa-solid fa-chevron-down" style="font-size:10px"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== NOTIFICATIONS DROPDOWN ===== -->
+    <div class="dropdown-panel" id="notifPanel">
+      <div class="dropdown-head">
+        <strong>Notifications</strong>
+        <button class="link-btn" id="markAllReadBtn">Mark all read</button>
+      </div>
+      <div class="dropdown-body" id="notifList"></div>
+    </div>
+
+    <!-- ===== ADMIN MENU DROPDOWN ===== -->
+    <div class="dropdown-panel admin-dropdown" id="adminPanel">
+      <a href="#" class="dropdown-link" data-route="settings"><i class="fa-solid fa-user"></i> My Profile</a>
+      <a href="#" class="dropdown-link" data-route="settings"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a href="#" class="dropdown-link" data-route="settings"><i class="fa-solid fa-shield-halved"></i> Activity Log</a>
+      <div class="dropdown-sep"></div>
+      <a href="#" class="dropdown-link danger" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <!-- ===== PAGE CONTENT ===== -->
+    <main class="content" id="content">
+      <!-- Sections are injected per-route by JS render functions -->
+    </main>
+  </div>
+</div>
+
+<script type="module" src="/js/admindashboard.js"></script>
+</body>
+</html>

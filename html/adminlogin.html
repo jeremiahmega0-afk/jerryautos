@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry Autos | Admin Secure Portal</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Dark Theme (Default Luxury Automotive Aesthetic) */
+            --bg-overlay: rgba(15, 23, 42, 0.85);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --input-border: rgba(255, 255, 255, 0.2);
+            --error: #ef4444;
+            --success: #10b981;
+            --bg-image: url('https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+        }
+
+        [data-theme="light"] {
+            /* Light Theme (Clean, High-Contrast Silver/White Premium look) */
+            --bg-overlay: rgba(248, 250, 252, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: rgba(0, 0, 0, 0.2);
+            --bg-image: url('https://images.unsplash.com/photo-1503376713280-4927f8a7862e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* Ambient Luxury Vehicle Background */
+        .bg-cover {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+        }
+
+        .bg-cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(5px);
+            z-index: -1;
+        }
+
+        /* Modern UI Glass controls */
+        .theme-btn {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .admin-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 2.5rem;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: 1rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--accent-blue);
+        }
+
+        .secure-badge {
+            font-size: 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .welcome-text h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Advanced Inputs & Layouts */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i:first-child {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 2.8rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .icon-btn {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Buttons & Dynamic Spinners */
+        .primary-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .primary-btn:hover {
+            background: var(--accent-blue-hover);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .text-btn {
+            width: 100%;
+            padding: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .text-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* 2FA Pin Layout */
+        .otp-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .otp-input {
+            width: 3rem;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+        }
+
+        .otp-input:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Floating Modern Toast System */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: var(--glass-bg);
+            border-left: 4px solid var(--accent-blue);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideIn 0.3s ease-out;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast.error { border-left-color: var(--error); }
+        .toast.success { border-left-color: var(--success); }
+
+        /* UI Micro-interactions */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Fluid Responsiveness */
+        @media (max-width: 480px) {
+            .admin-container {
+                padding: 1.5rem;
+            }
+            .otp-input {
+                width: 2.5rem;
+                height: 3rem;
+            }
+            .toast-container {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+            }
+            .toast {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-cover"></div>
+
+    <button id="themeToggle" class="theme-btn" aria-label="Toggle Dark/Light Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <main class="admin-container">
+        <div class="admin-header">
+            <div class="logo">
+                <i class="fas fa-car-side"></i> JERRY <span>AUTOS</span>
+            </div>
+            <div class="secure-badge">
+                <i class="fas fa-shield-alt"></i> Secure Admin Access
+            </div>
+        </div>
+
+        <div class="auth-card">
+            <div id="loginStep">
+                <div class="welcome-text">
+                    <h2>Welcome Back, Admin</h2>
+                    <p>Enter your credentials to access the dashboard.</p>
+                </div>
+
+                <form id="loginForm" novalidate>
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="admin@jerryautos.com" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="••••••••" required>
+                            <button type="button" id="togglePassword" class="icon-btn">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <label class="remember-me">
+                            <input type="checkbox" id="remember">
+                            <span>Remember Me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" id="loginBtn" class="primary-btn">
+                        <span class="btn-text">Sign In</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div id="otpStep" class="hidden">
+                <div class="welcome-text">
+                    <h2>Two-Factor Authentication</h2>
+                    <p>Enter the 6-digit verification code sent to your device.</p>
+                </div>
+
+                <form id="otpForm">
+                    <div class="input-group otp-group">
+                        <input type="text" maxlength="1" class="otp-input" autofocus>
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                    </div>
+
+                    <button type="submit" id="otpBtn" class="primary-btn">
+                        <span class="btn-text">Verify Identity</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                    <button type="button" id="backToLogin" class="text-btn">Back to Login</button>
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Jerry Autos. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const loginForm = document.getElementById('loginForm');
+            const otpForm = document.getElementById('otpForm');
+            const loginStep = document.getElementById('loginStep');
+            const otpStep = document.getElementById('otpStep');
+            const backToLoginBtn = document.getElementById('backToLogin');
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const toastContainer = document.getElementById('toastContainer');
+
+            // Persistent UI Mode Engine
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon(currentTheme);
+
+            themeToggle.addEventListener('click', () => {
+                let theme = document.documentElement.getAttribute('data-theme');
+                let newTheme = theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+
+            function updateThemeIcon(theme) {
+                const icon = themeToggle.querySelector('i');
+                icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            // Input Visibility Toggle
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+
+            // Native Notification Delivery Component
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                let icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+                if (type === 'info') icon = 'fa-info-circle';
+
+                toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+                toastContainer.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            function setLoading(button, isLoading) {
+                const text = button.querySelector('.btn-text');
+                const spinner = button.querySelector('.spinner');
+                
+                if (isLoading) {
+                    text.classList.add('hidden');
+                    spinner.classList.remove('hidden');
+                    button.disabled = true;
+                } else {
+                    text.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    button.disabled = false;
+                }
+            }
+
+            // Phase 1 Authentication Validation
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = passwordInput.value;
+
+                if (!email || !password) {
+                    showToast('Please enter valid administrative credentials.', 'error');
+                    return;
+                }
+
+                const btn = document.getElementById('loginBtn');
+                setLoading(btn, true);
+
+                // Simulated Secure Database Validation Sequence
+                setTimeout(() => {
+                    setLoading(btn, false);
+                    
+                    // Demo Check Architecture (Accepts any email containing 'admin' and minimum 6 character passphrase)
+                    if (email.includes('admin') && password.length >= 6) {
+                        showToast('Credentials authorized. Loading 2FA secure block...', 'info');
+                        
+                        setTimeout(() => {
+                            loginStep.classList.add('hidden');
+                            otpStep.classList.remove('hidden');
+                            otpInputs[0].focus();
+                        }, 1000);
+                        
+                    } else {
+                        showToast('Access denied. Security log updated with failed attempt.', 'error');
+                    }
+                }, 1500);
+            });
+
+            // 2FA Key Up Auto-Focus Workflow
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('keyup', (e) => {
+                    if (e.key >= '0' && e.key <= '9') {
+                        if (index < otpInputs.length - 1) {
+                            otpInputs[index + 1].focus();
+                        }
+                    } else if (e.key === 'Backspace') {
+                        if (index > 0) {
+                            otpInputs[index - 1].focus();
+                        }
+                    }
+                });
+            });
+
+            // Final Identity Verification Stage
+            otpForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                let otp = '';
+                otpInputs.forEach(input => otp += input.value);
+
+                if (otp.length < 6) {
+                    showToast('Complete the token validation array.', 'error');
+                    return;
+                }
+
+                const btn = document.getElementById('otpBtn');
+                setLoading(btn, true);
+
+                setTimeout(() => {
+                    setLoading(btn, false);
+                    showToast('Secure handshake accepted. Entering administration hub...', 'success');
+                    
+                    setTimeout(() => {
+                        loginForm.reset();
+                        otpForm.reset();
+                        window.location.reload(); // Re-initializes login environment simulation
+                    }, 2000);
+                    
+                }, 2000);
+            });
+
+            backToLoginBtn.addEventListener('click', () => {
+                otpForm.reset();
+                otpStep.classList.add('hidden');
+                loginStep.classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

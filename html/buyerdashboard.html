@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerry Autos | Buyer Dashboard</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app":      "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+            "firebase/auth":     "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+            "firebase/firestore":"https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+            "firebase/storage":  "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-hover: #1e3a8a;
+            --secondary: #374151;
+            --accent: #f97316;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+
+            --bg-body: #f3f4f6;
+            --bg-surface: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.1);
+
+            --sidebar-width: 260px;
+            --topbar-height: 70px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #111827;
+            --bg-surface: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --glass-bg: rgba(31, 41, 55, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --shadow-hover: 0 10px 15px -3px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+        body { background-color: var(--bg-body); color: var(--text-main); transition: background-color var(--transition), color var(--transition); overflow-x: hidden; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+
+        button, input, select, textarea { font-family: inherit; color: inherit; }
+        button { cursor: pointer; border: none; background: none; }
+
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            transition: var(--transition); z-index: 100;
+            flex-shrink: 0;
+        }
+        .sidebar.collapsed { width: 80px; }
+
+        .logo-area {
+            height: var(--topbar-height); display: flex; align-items: center;
+            padding: 0 24px; font-size: 20px; font-weight: 700;
+            color: var(--primary); border-bottom: 1px solid var(--border);
+            gap: 10px; white-space: nowrap; overflow: hidden;
+        }
+        .logo-area i { font-size: 28px; color: var(--accent); flex-shrink: 0; }
+        .sidebar.collapsed .logo-text { display: none; }
+
+        .nav-menu { flex: 1; padding: 15px 0; overflow-y: auto; list-style: none; }
+        .nav-item {
+            padding: 12px 24px; display: flex; align-items: center; gap: 12px;
+            color: var(--text-muted); transition: var(--transition);
+            margin: 4px 12px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+        }
+        .nav-item:hover, .nav-item.active { background-color: var(--primary); color: white; }
+        .nav-item i { font-size: 22px; flex-shrink: 0; }
+        .sidebar.collapsed .nav-text { display: none; }
+
+        .sidebar-footer { border-top: 1px solid var(--border); padding: 10px 0; }
+        .logout-btn { color: var(--error); }
+        .logout-btn:hover { background-color: rgba(239, 68, 68, 0.1) !important; color: var(--error) !important; }
+
+        /* ── Main ── */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; min-width: 0; }
+
+        .topbar {
+            height: var(--topbar-height); background: var(--glass-bg);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; position: sticky; top: 0; z-index: 50; flex-shrink: 0;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 20px; }
+        .topbar-right { display: flex; align-items: center; gap: 20px; }
+
+        .icon-btn { font-size: 22px; color: var(--text-muted); transition: var(--transition); position: relative; }
+        .icon-btn:hover { color: var(--primary); }
+        .notif-badge {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--error); color: white; font-size: 10px;
+            font-weight: bold; height: 16px; width: 16px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+        .user-info h4 { font-size: 14px; }
+        .user-info p { font-size: 12px; color: var(--text-muted); }
+
+        /* ── Content ── */
+        .content-area { flex: 1; padding: 30px; overflow-y: auto; background-color: var(--bg-body); }
+        .view-section { display: none; animation: fadeIn 0.35s ease-in-out; }
+        .view-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Welcome banner ── */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white; padding: 30px; border-radius: 16px; margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center; gap: 20px;
+        }
+        .welcome-text h1 { font-size: 24px; margin-bottom: 8px; }
+        .welcome-text p { opacity: 0.85; font-size: 14px; }
+
+        /* ── Stats ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: var(--bg-surface); padding: 20px; border-radius: 16px;
+            box-shadow: var(--shadow); border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 15px; transition: var(--transition); cursor: pointer;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .stat-icon.blue   { background: rgba(30,64,175,0.1);   color: var(--primary); }
+        .stat-icon.green  { background: rgba(16,185,129,0.1);  color: var(--success); }
+        .stat-icon.orange { background: rgba(249,115,22,0.1);  color: var(--accent); }
+        .stat-icon.purple { background: rgba(139,92,246,0.1);  color: #8b5cf6; }
+        .stat-details h3 { font-size: 22px; font-weight: 700; }
+        .stat-details p  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ── Section header ── */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-header h2 { font-size: 20px; }
+
+        /* ── Filters ── */
+        .filters-bar {
+            background: var(--bg-surface); padding: 20px; border-radius: 16px;
+            margin-bottom: 24px; box-shadow: var(--shadow);
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; border: 1px solid var(--border);
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 8px; }
+        .filter-group label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .filter-input {
+            padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg-body); color: var(--text-main); outline: none; transition: var(--transition);
+        }
+        .filter-input:focus { border-color: var(--primary); }
+
+        /* ── Vehicle Grid ── */
+        .vehicles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+
+        .vehicle-card {
+            background: var(--bg-surface); border-radius: 16px; overflow: hidden;
+            box-shadow: var(--shadow); border: 1px solid var(--border);
+            transition: var(--transition); display: flex; flex-direction: column;
+        }
+        .vehicle-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+
+        .vc-image-container { position: relative; height: 200px; background-color: var(--secondary); overflow: hidden; }
+        .vc-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .vc-image-placeholder {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            font-size: 48px; background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        }
+
+        .vc-badge {
+            position: absolute; top: 12px; left: 12px;
+            background: var(--glass-bg); backdrop-filter: blur(4px);
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+        .vc-badge.petrol  { background: rgba(249,115,22,0.85); color: white; border: none; }
+        .vc-badge.diesel  { background: rgba(30,64,175,0.85);  color: white; border: none; }
+        .vc-badge.electric{ background: rgba(16,185,129,0.85); color: white; border: none; }
+        .vc-badge.hybrid  { background: rgba(139,92,246,0.85); color: white; border: none; }
+
+        .vc-save-btn {
+            position: absolute; top: 12px; right: 12px;
+            background: white; border-radius: 50%; width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow); font-size: 20px; color: var(--text-muted);
+            transition: var(--transition); border: none; cursor: pointer;
+        }
+        .vc-save-btn:hover { transform: scale(1.1); }
+        .vc-save-btn.saved { color: var(--error); }
+
+        .vc-content { padding: 18px; display: flex; flex-direction: column; flex: 1; }
+        .vc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; }
+        .vc-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .vc-seller { font-size: 12px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+        .vc-price { font-size: 17px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+
+        .vc-specs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; font-size: 13px; color: var(--text-muted); }
+        .vc-specs span { display: flex; align-items: center; gap: 4px; }
+
+        .vc-footer { border-top: 1px solid var(--border); padding-top: 14px; display: flex; gap: 10px; margin-top: auto; }
+        .vc-footer button { flex: 1; }
+
+        /* ── Empty state ── */
+        .empty-state {
+            grid-column: 1 / -1; text-align: center; padding: 50px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i { font-size: 56px; margin-bottom: 16px; display: block; opacity: 0.4; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; margin-bottom: 20px; }
+
+        /* ── Loading skeleton ── */
+        .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+        .skeleton-card { background: var(--bg-surface); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+        .skeleton-img { height: 200px; background: linear-gradient(90deg, var(--border) 25%, var(--bg-body) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+        .skeleton-body { padding: 18px; }
+        .skeleton-line { height: 14px; border-radius: 4px; background: linear-gradient(90deg, var(--border) 25%, var(--bg-body) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 10px; }
+        .skeleton-line.short { width: 60%; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* ── Chat ── */
+        .chat-container {
+            display: grid; grid-template-columns: 280px 1fr;
+            height: calc(100vh - var(--topbar-height) - 80px);
+            background: var(--bg-surface); border-radius: 16px;
+            border: 1px solid var(--border); overflow: hidden; min-height: 450px;
+        }
+        .chat-sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .chat-search { padding: 15px; border-bottom: 1px solid var(--border); }
+        .chat-threads { flex: 1; overflow-y: auto; }
+        .chat-thread-item {
+            padding: 15px; display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition);
+        }
+        .chat-thread-item:hover, .chat-thread-item.active { background: var(--bg-body); }
+        .thread-avatar {
+            width: 45px; height: 45px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            position: relative; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 18px; font-weight: 700;
+        }
+        .status-dot {
+            position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
+            border-radius: 50%; border: 2px solid var(--bg-surface);
+        }
+        .status-dot.online { background: var(--success); }
+        .thread-info { flex: 1; min-width: 0; }
+        .thread-info h4 { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .thread-info p  { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+        .chat-window { display: flex; flex-direction: column; background: var(--bg-body); }
+        .chat-header {
+            padding: 15px 25px; background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .chat-header h4 { font-size: 15px; font-weight: 600; }
+        .chat-header p  { font-size: 12px; color: var(--success); margin-top: 2px; }
+
+        .chat-messages-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .chat-msg {
+            max-width: 70%; padding: 12px 16px; border-radius: 12px;
+            font-size: 14px; line-height: 1.5;
+        }
+        .chat-msg.received { background: var(--bg-surface); align-self: flex-start; border-top-left-radius: 0; }
+        .chat-msg.sent     { background: var(--primary); color: white; align-self: flex-end; border-top-right-radius: 0; }
+        .chat-msg-time { font-size: 10px; opacity: 0.65; margin-top: 5px; }
+        .sent .chat-msg-time { text-align: right; }
+
+        .chat-input-bar { padding: 15px 25px; background: var(--bg-surface); border-top: 1px solid var(--border); display: flex; gap: 12px; }
+        .chat-input { flex: 1; padding: 12px 20px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg-body); outline: none; color: var(--text-main); }
+        .chat-input:focus { border-color: var(--primary); }
+
+        /* ── Compare table ── */
+        .compare-container {
+            background: var(--bg-surface); border-radius: 16px;
+            border: 1px solid var(--border); padding: 25px; overflow-x: auto;
+        }
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+        .compare-table th, .compare-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+        .compare-table th { background: var(--bg-body); font-weight: 600; color: var(--text-muted); }
+        .compare-table td:first-child { font-weight: 600; white-space: nowrap; }
+        .compare-best { color: var(--success); font-weight: 700; }
+        .compare-remove { color: var(--error); cursor: pointer; font-size: 18px; vertical-align: middle; margin-left: 8px; }
+
+        /* ── Data tables ── */
+        .card-panel { background: var(--bg-surface); border-radius: 16px; border: 1px solid var(--border); padding: 25px; margin-bottom: 25px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+        .data-table th, .data-table td { padding: 14px; border-bottom: 1px solid var(--border); }
+        .data-table th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+
+        .status-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-chip.success { background: rgba(16,185,129,0.12); color: var(--success); }
+        .status-chip.warning { background: rgba(245,158,11,0.12); color: var(--warning); }
+
+        /* ── Notifications ── */
+        .notification-item { display: flex; align-items: flex-start; gap: 15px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .notification-item:last-child { border-bottom: none; }
+        .notif-icon { width: 42px; height: 42px; border-radius: 50%; background: rgba(30,64,175,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .notif-body h4 { font-size: 14px; font-weight: 600; }
+        .notif-body p  { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+        .notif-body .notif-time { font-size: 11px; color: var(--primary); margin-top: 5px; font-weight: 500; }
+
+        /* ── Profile ── */
+        .profile-avatar-area { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; }
+        .profile-avatar-lg { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); }
+
+        /* ── FAQ ── */
+        .faq-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .faq-header { padding: 16px; background: var(--bg-body); font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .faq-header:hover { background: var(--border); }
+        .faq-body { padding: 16px; background: var(--bg-surface); display: none; font-size: 14px; line-height: 1.6; color: var(--text-muted); }
+        .faq-body.open { display: block; }
+
+        /* ── Buttons ── */
+        .btn-primary { background: var(--primary); color: white; padding: 10px 18px; border-radius: 8px; font-weight: 600; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { border: 1px solid var(--border); color: var(--text-main); background: transparent; padding: 10px 18px; border-radius: 8px; font-weight: 600; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn-outline:hover { background: var(--bg-body); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        /* ── Toast ── */
+        #toast-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast {
+            background: var(--bg-surface); border-left: 4px solid var(--primary);
+            padding: 14px 20px; border-radius: 8px; box-shadow: var(--shadow-hover);
+            color: var(--text-main); font-weight: 500; font-size: 14px;
+            display: flex; align-items: center; gap: 10px;
+            animation: slideIn 0.3s ease-out forwards; max-width: 320px;
+        }
+        .toast.error   { border-color: var(--error); }
+        .toast.success { border-color: var(--success); }
+        .toast.warning { border-color: var(--warning); }
+        @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(110%); opacity: 0; } }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .chat-container { grid-template-columns: 1fr; }
+            .chat-sidebar { display: none; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); box-shadow: var(--shadow-hover); }
+            .sidebar.active-mobile { transform: translateX(0); }
+            .welcome-banner { flex-direction: column; text-align: center; }
+            .filters-bar { grid-template-columns: 1fr; }
+            .content-area { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- ════════════════════ SIDEBAR ════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <i class='bx bxs-car'></i>
+            <span class="logo-text">Jerry Autos</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-view="dashboard">
+                <i class='bx bx-grid-alt'></i><span class="nav-text">Dashboard</span>
+            </li>
+            <li class="nav-item" data-view="marketplace">
+                <i class='bx bx-store'></i><span class="nav-text">Marketplace</span>
+            </li>
+            <li class="nav-item" data-view="saved">
+                <i class='bx bx-heart'></i><span class="nav-text">Saved Vehicles</span>
+            </li>
+            <li class="nav-item" data-view="compare">
+                <i class='bx bx-git-compare'></i><span class="nav-text">Compare</span>
+            </li>
+            <li class="nav-item" data-view="messages">
+                <i class='bx bx-message-square-dots'></i><span class="nav-text">Messages</span>
+            </li>
+            <li class="nav-item" data-view="orders">
+                <i class='bx bx-package'></i><span class="nav-text">My Orders</span>
+            </li>
+            <li class="nav-item" data-view="notifications">
+                <i class='bx bx-bell'></i><span class="nav-text">Notifications</span>
+            </li>
+            <li class="nav-item" data-view="profile">
+                <i class='bx bx-user'></i><span class="nav-text">My Profile</span>
+            </li>
+            <li class="nav-item" data-view="help">
+                <i class='bx bx-help-circle'></i><span class="nav-text">Help Center</span>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <ul class="nav-menu" style="padding: 0;">
+                <li class="nav-item logout-btn" id="logoutBtn">
+                    <i class='bx bx-log-out'></i><span class="nav-text">Log Out</span>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- ════════════════════ MAIN ════════════════════ -->
+    <div class="main-wrapper">
+
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="icon-btn" id="menuToggle"><i class='bx bx-menu'></i></button>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn" id="themeToggleBtn" title="Toggle theme">
+                    <i class='bx bx-moon' id="themeIcon"></i>
+                </button>
+                <button class="icon-btn" data-nav="notifications" title="Notifications">
+                    <i class='bx bx-bell'></i>
+                    <span class="notif-badge" id="notifBadge">2</span>
+                </button>
+                <div class="user-profile" data-nav="profile">
+                    <img src="https://ui-avatars.com/api/?name=Alex+Carter&background=1e40af&color=fff"
+                         alt="Avatar" class="avatar" id="globalAvatar">
+                    <div class="user-info">
+                        <h4 id="globalUsername">Loading2026</h4>
+                        <p>Premium Buyer</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+
+            <!-- ── DASHBOARD ── -->
+            <div id="view-dashboard" class="view-section active">
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h1>Welcome back, <span id="dashWelcomeName">Alex</span>! 👋</h1>
+                        <p>Track your activity, browse premium inventory, or pick up where you left off.</p>
+                    </div>
+                    <button class="btn-outline" style="background:rgba(255,255,255,0.2);color:white;border:none;" data-nav="marketplace">
+                        Browse Marketplace
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card" data-nav="saved">
+                        <div class="stat-icon blue"><i class='bx bx-heart'></i></div>
+                        <div class="stat-details"><h3 id="statSaved">0</h3><p>Saved Cars</p></div>
+                    </div>
+                    <div class="stat-card" data-nav="compare">
+                        <div class="stat-icon orange"><i class='bx bx-git-compare'></i></div>
+                        <div class="stat-details"><h3 id="statCompare">0</h3><p>In Comparison</p></div>
+                    </div>
+                    <div class="stat-card" data-nav="messages">
+                        <div class="stat-icon green"><i class='bx bx-message-rounded'></i></div>
+                        <div class="stat-details"><h3 id="statMessages">1</h3><p>Unread Messages</p></div>
+                    </div>
+                    <div class="stat-card" data-nav="marketplace">
+                        <div class="stat-icon purple"><i class='bx bx-car'></i></div>
+                        <div class="stat-details"><h3 id="statListings">—</h3><p>Live Listings</p></div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h2>Recommended for You</h2>
+                    <button class="btn-outline btn-sm" data-nav="marketplace">View all</button>
+                </div>
+                <div id="recommendedGrid" class="vehicles-grid">
+                    <div class="skeleton-grid" style="grid-column:1/-1;display:contents">
+                        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── MARKETPLACE ── -->
+            <div id="view-marketplace" class="view-section">
+                <div class="section-header">
+                    <h2>Vehicle Marketplace</h2>
+                    <span id="resultsCount" style="font-size:13px;color:var(--text-muted)"></span>
+                </div>
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" class="filter-input" id="searchFilter" placeholder="Make, model, year…">
+                    </div>
+                    <div class="filter-group">
+                        <label>Brand</label>
+                        <select class="filter-input" id="brandFilter">
+                            <option value="All">All Brands</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Fuel Type</label>
+                        <select class="filter-input" id="fuelFilter">
+                            <option value="All">All Types</option>
+                            <option value="Petrol">Petrol</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Electric">Electric</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select class="filter-input" id="sortFilter">
+                            <option value="default">Default</option>
+                            <option value="price-asc">Price: Low → High</option>
+                            <option value="price-desc">Price: High → Low</option>
+                            <option value="year-desc">Newest First</option>
+                            <option value="mileage-asc">Lowest Mileage</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="vehicles-grid" id="vehicleFeed"></div>
+            </div>
+
+            <!-- ── SAVED ── -->
+            <div id="view-saved" class="view-section">
+                <div class="section-header">
+                    <h2>Saved Vehicles</h2>
+                    <span id="savedCount" style="font-size:13px;color:var(--text-muted)"></span>
+                </div>
+                <div class="vehicles-grid" id="savedGrid"></div>
+            </div>
+
+            <!-- ── COMPARE ── -->
+            <div id="view-compare" class="view-section">
+                <div class="section-header">
+                    <h2>Vehicle Comparison</h2>
+                    <button class="btn-outline btn-sm" id="clearCompareBtn"><i class='bx bx-trash'></i> Clear All</button>
+                </div>
+                <div class="compare-container" id="compareContainer"></div>
+            </div>
+
+            <!-- ── MESSAGES ── -->
+            <div id="view-messages" class="view-section">
+                <div class="section-header">
+                    <h2>Messages</h2>
+                    <span id="unreadCount" style="font-size:13px;color:var(--text-muted)"></span>
+                </div>
+
+                <!-- Thread list preview — clicking any opens chat.html -->
+                <div id="msgThreadList" style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="text-align:center;padding:40px;color:var(--text-muted);font-size:.9rem">
+                        <i class='bx bx-loader-alt' style="font-size:2rem;display:block;margin-bottom:8px;animation:spin .8s linear infinite"></i>
+                        Loading conversations…
+                    </div>
+                </div>
+
+                <div style="margin-top:20px;text-align:center">
+                    <a href="chat.html?role=buyer" class="btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">
+                        <i class='bx bx-message-dots'></i> Open Full Chat
+                    </a>
+                </div>
+            </div>
+
+            <!-- ── ORDERS ── -->
+            <div id="view-orders" class="view-section">
+                <div class="section-header"><h2>My Orders</h2></div>
+                <div class="card-panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Vehicle</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#JA-98321</strong></td>
+                                <td>2023 Toyota Camry Hybrid</td>
+                                <td>May 14, 2026</td>
+                                <td><strong>₦28,500,000</strong></td>
+                                <td><span class="status-chip success"><i class='bx bx-check-circle'></i> Completed</span></td>
+                                <td>
+                                    <button class="btn-outline btn-sm" onclick="showToast('Downloading invoice…', 'info')">
+                                        <i class='bx bx-download'></i> Invoice
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── NOTIFICATIONS ── -->
+            <div id="view-notifications" class="view-section">
+                <div class="section-header"><h2>Notifications</h2>
+                    <button class="btn-outline btn-sm" onclick="markAllRead()">Mark all read</button>
+                </div>
+                <div class="card-panel" id="notificationsContainer">
+                    <div class="notification-item">
+                        <div class="notif-icon"><i class='bx bx-message-dots'></i></div>
+                        <div class="notif-body">
+                            <h4>New message from Jerry Support</h4>
+                            <p>Your delivery documentation has been processed and is ready to download.</p>
+                            <span class="notif-time">5 minutes ago</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notif-icon" style="background:rgba(16,185,129,0.1);color:var(--success)">
+                            <i class='bx bx-wallet'></i>
+                        </div>
+                        <div class="notif-body">
+                            <h4>Payment confirmed</h4>
+                            <p>Your payment for order #JA-98321 has been received and confirmed.</p>
+                            <span class="notif-time" style="color:var(--text-muted)">2 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── PROFILE ── -->
+            <div id="view-profile" class="view-section">
+                <div class="section-header"><h2>My Profile</h2></div>
+                <div class="card-panel">
+                    <div class="profile-avatar-area">
+                        <img src="https://ui-avatars.com/api/?name=Alex+Carter&background=1e40af&color=fff"
+                             id="profileDisplayImg" class="profile-avatar-lg" alt="Profile">
+                        <div>
+                            <input type="file" id="photoFileInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+                            <button class="btn-outline" style="margin-bottom:8px;" id="changePhotoBtn">
+                                <i class='bx bx-upload'></i> Change Photo
+                            </button>
+                            <p style="font-size:12px;color:var(--text-muted)" id="photoUploadStatus">JPEG, PNG or WebP · Max 4MB</p>
+                        </div>
+                    </div>
+                    <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
+                    <h3 style="margin-bottom:16px;">Account Details</h3>
+                    <div class="filters-bar" style="margin-bottom:20px;">
+                        <div class="filter-group">
+                            <label>Full Name</label>
+                            <input type="text" class="filter-input" id="profileNameInput" value="">
+                        </div>
+                        <div class="filter-group">
+                            <label>Email Address</label>
+                            <input type="email" class="filter-input" id="profileEmailInput" value="" disabled style="opacity:.6">
+                        </div>
+                        <div class="filter-group">
+                            <label>Phone Number</label>
+                            <input type="tel" class="filter-input" id="profilePhone" placeholder="+234 800 000 0000">
+                        </div>
+                        <div class="filter-group">
+                            <label>City</label>
+                            <input type="text" class="filter-input" id="profileCity" placeholder="Lagos, Abuja…">
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="saveProfileBtn">
+                        <i class='bx bx-save'></i> Save Changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── HELP ── -->
+            <div id="view-help" class="view-section">
+                <div class="section-header"><h2>Help Center</h2></div>
+                <div class="card-panel">
+                    <div class="faq-item">
+                        <div class="faq-header">How does Jerry Autos verify listings? <i class='bx bx-chevron-down'></i></div>
+                        <div class="faq-body">Every vehicle on Jerry Autos undergoes a comprehensive 150-point physical inspection and full history report before being approved on the marketplace.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">How do I download my invoice? <i class='bx bx-chevron-down'></i></div>
+                        <div class="faq-body">Go to "My Orders" in the sidebar, find your order, and click the Invoice button to download a PDF receipt.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">Can I negotiate the price with a seller? <i class='bx bx-chevron-down'></i></div>
+                        <div class="faq-body">Yes! Use the "Contact Seller" button on any listing to open a direct chat and negotiate the price or ask questions about the vehicle.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-header">What payment methods are accepted? <i class='bx bx-chevron-down'></i></div>
+                        <div class="faq-body">Jerry Autos supports bank transfers, Paystack, Flutterwave, and USSD payments. All transactions are processed securely through our escrow system.</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- ════════════════════ FIREBASE AUTH MODULE ════════════════════ -->
+<script type="module">
+import { initializeApp }  from "firebase/app";
+import {
+    getAuth, onAuthStateChanged, signOut,
+    updateProfile as fbUpdateProfile
+} from "firebase/auth";
+import {
+    getStorage, ref as storageRef,
+    uploadBytesResumable, getDownloadURL
+} from "firebase/storage";
+import {
+    getFirestore,
+    collection, query, where, orderBy, onSnapshot
+} from "firebase/firestore";
+
+/* ── Firebase config (same project as seller dashboard) ── */
+const firebaseConfig = {
+    apiKey:            "AIzaSyD6ZVDHScoK2DnL-vI4WcqSqXA8bLO4Ua4",
+    authDomain:        "myblog-508d5.firebaseapp.com",
+    projectId:         "myblog-508d5",
+    storageBucket:     "myblog-508d5.firebasestorage.app",
+    messagingSenderId: "521781823289",
+    appId:             "1:521781823289:web:c6dea9369689a844548ae8"
+};
+
+const fbApp   = initializeApp(firebaseConfig);
+const auth    = getAuth(fbApp);
+const storage = getStorage(fbApp);
+const db      = getFirestore(fbApp);
+
+/* ════════════════════════════════════════════════════
+   THREAD PREVIEW — buyer messages view
+   Reads chats where buyer is a participant and renders
+   a clickable list that opens chat.html
+   ════════════════════════════════════════════════════ */
+let unsubThreads = null;
+
+function subscribeThreadPreview(buyerUid) {
+    if (unsubThreads) unsubThreads();
+
+    const q = query(
+        collection(db, 'chats'),
+        where('participants', 'array-contains', buyerUid),
+        orderBy('updatedAt', 'desc')
+    );
+
+    unsubThreads = onSnapshot(q, (snap) => {
+        const threads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderThreadPreview(threads, buyerUid);
+    }, () => {
+        /* Firestore index not yet built or permission error — show link only */
+        document.getElementById('msgThreadList').innerHTML = `
+            <p style="color:var(--text-muted);font-size:.875rem;text-align:center;padding:20px">
+                Open full chat to see your conversations.
+            </p>`;
+    });
+}
+
+function fmtThreadTime(ts) {
+    if (!ts) return '';
+    const d   = ts.toDate ? ts.toDate() : new Date(ts);
+    const now  = new Date();
+    const diff = Math.floor((now - d) / 86400000);
+    if (diff === 0) return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    if (diff === 1) return 'Yesterday';
+    return d.toLocaleDateString([], { month:'short', day:'numeric' });
+}
+
+function renderThreadPreview(threads, buyerUid) {
+    const container  = document.getElementById('msgThreadList');
+    const unreadEl   = document.getElementById('unreadCount');
+    if (!container) return;
+
+    const totalUnread = threads.reduce((s, t) => s + (t.unreadBuyer || 0), 0);
+    if (unreadEl) unreadEl.textContent = totalUnread > 0 ? `${totalUnread} unread` : `${threads.length} conversation${threads.length !== 1 ? 's' : ''}`;
+
+    if (threads.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:50px 20px;color:var(--text-muted)">
+                <i class='bx bx-message-rounded-x' style="font-size:3rem;display:block;margin-bottom:12px;opacity:.3"></i>
+                <p style="font-size:.9rem">No conversations yet.<br>Click <strong>Contact</strong> on any listing to start one.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = threads.map(t => {
+        const sellerName  = t.sellerName  || 'Seller';
+        const sellerPhoto = t.sellerPhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=ef4444&color=fff&size=80`;
+        const unread      = t.unreadBuyer || 0;
+        const preview     = t.lastMessage || 'No messages yet';
+        const time        = fmtThreadTime(t.updatedAt);
+
+        return `
+        <div onclick="window.location.href='chat.html?role=buyer&sellerId=${encodeURIComponent(t.sellerId)}'"
+             style="display:flex;align-items:center;gap:14px;padding:14px 16px;
+                    background:var(--bg-surface);border-radius:14px;border:1px solid var(--border);
+                    cursor:pointer;transition:all .2s;box-shadow:var(--shadow)"
+             onmouseover="this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.transform='translateY(0)'">
+            <img src="${sellerPhoto}" alt="${sellerName}"
+                 onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=ef4444&color=fff&size=80'"
+                 style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);flex-shrink:0">
+            <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sellerName}</div>
+                <div style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${preview}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+                <span style="font-size:.72rem;color:var(--text-muted)">${time}</span>
+                ${unread > 0 ? `<span style="background:var(--primary);color:#fff;font-size:.68rem;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px">${unread}</span>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* ════════════════════════════════════════════════════
+   AUTH WATCHER
+   Runs as soon as Firebase resolves the session.
+   Populates every piece of UI that depends on identity.
+   ════════════════════════════════════════════════════ */
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        applyFirebaseUser(user);
+        subscribeThreadPreview(user.uid);
+    } else {
+        /* No active session — show guest state */
+        applyGuestUser();
+        /* Uncomment to force redirect to login page:
+           window.location.href = '/login.html'; */
+    }
+});
+
+/* Push Firebase user data into every UI element */
+function applyFirebaseUser(user) {
+    const name  = user.displayName || user.email?.split('@')[0] || 'Buyer';
+    const photo = user.photoURL;    // null if not set
+    const email = user.email || '';
+
+    /* Update state so the rest of the app reads from it */
+    window._fbUser = user;          // kept for save / upload handlers
+    state.profile.name  = name;
+    state.profile.email = email;
+    state.profile.photo = photo;
+
+    applyProfileUI(name, photo, email);
+    showToast(`Welcome back, ${name.split(' ')[0]}! 👋`, 'success');
+}
+
+function applyGuestUser() {
+    applyProfileUI('Guest', null, '');
+}
+
+/* Central function that stamps name + photo everywhere */
+window.applyProfileUI = function(name, photoURL, email = '') {
+    const firstName = name.split(' ')[0];
+
+    /* Topbar */
+    document.getElementById('globalUsername').textContent = name;
+    /* Dashboard welcome */
+    document.getElementById('dashWelcomeName').textContent = firstName;
+    /* Profile form */
+    document.getElementById('profileNameInput').value = name;
+    if (email) {
+        const emailInput = document.getElementById('profileEmailInput');
+        if (emailInput) emailInput.value = email;
+    }
+
+    /* Photo — use Firebase photoURL if available, otherwise generate initials avatar */
+    const avatarSrc = photoURL || generateAvatarUrl(name);
+    document.getElementById('globalAvatar').src     = avatarSrc;
+    document.getElementById('profileDisplayImg').src = avatarSrc;
+};
+
+function generateAvatarUrl(name) {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1e40af&color=fff&size=128`;
+}
+
+/* ════════════════════════════════════════════════════
+   PROFILE SAVE — pushes name update back to Firebase Auth
+   ════════════════════════════════════════════════════ */
+window.saveFirebaseProfile = async function() {
+    const user = window._fbUser;
+    const nameInput = document.getElementById('profileNameInput');
+    const name = nameInput.value.trim();
+
+    if (!name) { showToast('Name cannot be empty.', 'warning'); return; }
+
+    const saveBtn = document.getElementById('saveProfileBtn');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Saving…`;
+
+    try {
+        if (user) {
+            await fbUpdateProfile(user, { displayName: name });
+            state.profile.name = name;
+            applyProfileUI(name, user.photoURL, user.email);
+            showToast('Profile updated!', 'success');
+        } else {
+            /* Guest fallback — save to localStorage only */
+            state.profile.name = name;
+            localStorage.setItem('jerry_profile', JSON.stringify(state.profile));
+            applyProfileUI(name, null, '');
+            showToast('Profile saved locally.', 'info');
+        }
+    } catch (err) {
+        console.error('Profile update error:', err);
+        showToast('Could not update profile. Try again.', 'error');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = `<i class='bx bx-save'></i> Save Changes`;
+    }
+};
+
+/* ════════════════════════════════════════════════════
+   PHOTO UPLOAD — Firebase Storage → updateProfile photoURL
+   ════════════════════════════════════════════════════ */
+document.getElementById('changePhotoBtn').addEventListener('click', () => {
+    document.getElementById('photoFileInput').click();
+});
+
+document.getElementById('photoFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 4 * 1024 * 1024) {
+        showToast('File too large. Max size is 4MB.', 'error');
+        return;
+    }
+
+    const user = window._fbUser;
+    if (!user) {
+        showToast('You must be signed in to upload a photo.', 'error');
+        return;
+    }
+
+    const statusEl = document.getElementById('photoUploadStatus');
+    statusEl.textContent = 'Uploading…';
+
+    try {
+        /* Show instant local preview while upload runs */
+        const localPreview = URL.createObjectURL(file);
+        document.getElementById('profileDisplayImg').src = localPreview;
+        document.getElementById('globalAvatar').src      = localPreview;
+
+        /* Upload to Firebase Storage under buyers/{uid}/avatar */
+        const fileRef  = storageRef(storage, `buyers/${user.uid}/avatar`);
+        const task     = uploadBytesResumable(fileRef, file);
+
+        task.on('state_changed',
+            (snap) => {
+                const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+                statusEl.textContent = `Uploading… ${pct}%`;
+            },
+            (err) => {
+                console.error('Upload error:', err);
+                showToast('Upload failed. Check storage permissions.', 'error');
+                statusEl.textContent = 'Upload failed.';
+            },
+            async () => {
+                /* Upload complete — get permanent URL and save to Auth profile */
+                const downloadURL = await getDownloadURL(task.snapshot.ref);
+                await fbUpdateProfile(user, { photoURL: downloadURL });
+
+                /* Stamp the permanent URL on both images */
+                document.getElementById('profileDisplayImg').src = downloadURL;
+                document.getElementById('globalAvatar').src      = downloadURL;
+                state.profile.photo = downloadURL;
+
+                URL.revokeObjectURL(localPreview);
+                statusEl.textContent = 'JPEG, PNG or WebP · Max 4MB';
+                showToast('Profile photo updated!', 'success');
+            }
+        );
+
+    } catch (err) {
+        console.error('Photo upload error:', err);
+        showToast('Could not upload photo. Try again.', 'error');
+        statusEl.textContent = 'JPEG, PNG or WebP · Max 4MB';
+    }
+
+    /* Reset input so same file can be re-selected */
+    e.target.value = '';
+});
+
+/* ════════════════════════════════════════════════════
+   LOGOUT — Firebase sign out
+   ════════════════════════════════════════════════════ */
+window.firebaseSignOut = async function() {
+    try {
+        await signOut(auth);
+        showToast('Signed out. See you soon!', 'info');
+        setTimeout(() => window.location.href = '/login.html', 1200);
+    } catch (err) {
+        showToast('Sign-out failed. Try again.', 'error');
+    }
+};
+
+</script>
+
+<!-- ════════════════════ APP SCRIPT ════════════════════ -->
+<script>
+/* ════════════════════════════════════════════════════
+   CONSTANTS
+   ════════════════════════════════════════════════════ */
+const API_BASE = 'http://localhost:5000/api';
+
+/* ════════════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════════════ */
+const state = {
+    vehicles:   [],
+    filtered:   [],
+    saved:      JSON.parse(localStorage.getItem('jerry_saved')   || '[]'),
+    compare:    JSON.parse(localStorage.getItem('jerry_compare') || '[]'),
+    theme:      localStorage.getItem('jerry_theme') || 'light',
+    profile:    { name: 'Loading…', email: '', photo: null }, // populated by Firebase
+    activeChat: 'Jerry Support',
+};
+
+/* ════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
+    /* Profile is populated by onAuthStateChanged in the Firebase module above */
+    bindNavigation();
+    bindFilters();
+    bindUI();
+    loadMarketplace();
+});
+
+/* ════════════════════════════════════════════════════
+   SERVER — FETCH ALL PUBLIC LISTINGS
+   GET /api/vehicles  (no sellerId → public buyer view)
+   Server strips sellerId, returns only Available cars
+   ════════════════════════════════════════════════════ */
+async function loadMarketplace() {
+    showSkeletons('recommendedGrid', 2);
+    showSkeletons('vehicleFeed', 4);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+    try {
+        const res = await fetch(`${API_BASE}/vehicles`, { signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+        const data = await res.json();
+
+        // Normalise id — server sends both id and _id
+        state.vehicles = data.map(v => ({ ...v, id: v.id || v._id }));
+        state.filtered  = [...state.vehicles];
+
+        populateBrandDropdown();
+        updateCounters();
+
+        // Recommended: first 3 listings
+        renderGrid(state.vehicles.slice(0, 3), 'recommendedGrid');
+        renderGrid(state.vehicles, 'vehicleFeed');
+
+        document.getElementById('statListings').textContent = state.vehicles.length;
+        updateResultsCount(state.vehicles.length);
+
+    } catch (err) {
+        clearTimeout(timeout);
+        const isTimeout = err.name === 'AbortError';
+        const msg = isTimeout
+            ? 'Server took too long to respond. Is it running?'
+            : 'Could not connect to the server. Make sure it is running on port 5000.';
+
+        showToast(msg, 'error');
+
+        const errHTML = `
+            <div class="empty-state" style="grid-column:1/-1">
+                <i class='bx bx-wifi-off'></i>
+                <h3>Cannot reach server</h3>
+                <p>${msg}</p>
+                <button class="btn-primary" onclick="loadMarketplace()">
+                    <i class='bx bx-refresh'></i> Retry
+                </button>
+            </div>`;
+        document.getElementById('vehicleFeed').innerHTML = errHTML;
+        document.getElementById('recommendedGrid').innerHTML = errHTML;
+    }
+}
+
+/* ════════════════════════════════════════════════════
+   RENDER — VEHICLE CARD GRID
+   ════════════════════════════════════════════════════ */
+function renderGrid(dataset, targetId) {
+    const container = document.getElementById(targetId);
+    if (!container) return;
+
+    if (dataset.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class='bx bx-search-alt'></i>
+                <h3>No vehicles found</h3>
+                <p>Try adjusting your filters or check back later.</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = '';
+    dataset.forEach(car => {
+        const id         = car.id;
+        const isSaved    = state.saved.includes(id);
+        const isCompared = state.compare.includes(id);
+        const title      = `${car.year || ''} ${car.make || ''} ${car.model || ''}`.trim();
+        const price      = car.price ? `₦${Number(car.price).toLocaleString()}` : 'Contact seller';
+        const mileage    = car.mileage ? `${Number(car.mileage).toLocaleString()} km` : '—';
+        const fuel       = (car.fuelType || 'Verified').toLowerCase();
+        const seller     = car.sellerAlias || 'Verified Dealer';
+
+        const card = document.createElement('div');
+        card.className = 'vehicle-card';
+        card.innerHTML = `
+            <div class="vc-image-container">
+                ${car.image
+                    ? `<img src="${escHtml(car.image)}" alt="${escHtml(title)}" class="vc-image"
+                            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                    : ''}
+                <div class="vc-image-placeholder" style="${car.image ? 'display:none' : ''}">🚗</div>
+                <span class="vc-badge ${fuel}">${car.fuelType || 'Verified'}</span>
+                <button class="vc-save-btn ${isSaved ? 'saved' : ''}"
+                        title="${isSaved ? 'Remove from saved' : 'Save this car'}"
+                        data-id="${id}" onclick="toggleSave('${id}', this)">
+                    <i class='bx ${isSaved ? 'bxs-heart' : 'bx-heart'}'></i>
+                </button>
+            </div>
+            <div class="vc-content">
+                <div class="vc-header">
+                    <div>
+                        <div class="vc-title">${escHtml(title) || 'Unknown Vehicle'}</div>
+                        <div class="vc-seller"><i class='bx bx-store'></i> ${escHtml(seller)}</div>
+                    </div>
+                    <div class="vc-price">${price}</div>
+                </div>
+                <div class="vc-specs">
+                    <span><i class='bx bx-tachometer'></i> ${mileage}</span>
+                    <span><i class='bx bx-cog'></i> ${car.transmission || '—'}</span>
+                    <span><i class='bx bx-calendar'></i> ${car.year || '—'}</span>
+                </div>
+                <div class="vc-footer">
+                    <button class="btn-outline ${isCompared ? 'btn-active' : ''}"
+                            onclick="toggleCompare('${id}')"
+                            style="${isCompared ? 'border-color:var(--primary);color:var(--primary)' : ''}">
+                        <i class='bx bx-git-compare'></i> ${isCompared ? 'Comparing' : 'Compare'}
+                    </button>
+                    <button class="btn-primary" onclick="contactSeller('${escHtml(car.sellerId || '')}')">
+                        <i class='bx bx-message-rounded'></i> Contact
+                    </button>
+                </div>
+            </div>`;
+        container.appendChild(card);
+    });
+}
+
+/* ════════════════════════════════════════════════════
+   FILTERS — search, brand, fuel, sort
+   ════════════════════════════════════════════════════ */
+function applyFilters() {
+    const search = document.getElementById('searchFilter').value.toLowerCase().trim();
+    const brand  = document.getElementById('brandFilter').value;
+    const fuel   = document.getElementById('fuelFilter').value;
+    const sort   = document.getElementById('sortFilter').value;
+
+    let list = [...state.vehicles];
+
+    // Search: make, model, year, seller alias
+    if (search) {
+        list = list.filter(c =>
+            `${c.make} ${c.model} ${c.year} ${c.sellerAlias || ''}`.toLowerCase().includes(search)
+        );
+    }
+
+    if (brand !== 'All') list = list.filter(c => c.make === brand);
+    if (fuel  !== 'All') list = list.filter(c => c.fuelType === fuel);
+
+    switch (sort) {
+        case 'price-asc':   list.sort((a, b) => a.price - b.price); break;
+        case 'price-desc':  list.sort((a, b) => b.price - a.price); break;
+        case 'year-desc':   list.sort((a, b) => b.year  - a.year);  break;
+        case 'mileage-asc': list.sort((a, b) => a.mileage - b.mileage); break;
+    }
+
+    state.filtered = list;
+    renderGrid(list, 'vehicleFeed');
+    updateResultsCount(list.length);
+}
+
+function populateBrandDropdown() {
+    const sel = document.getElementById('brandFilter');
+    sel.innerHTML = '<option value="All">All Brands</option>';
+    [...new Set(state.vehicles.map(c => c.make).filter(Boolean))].sort().forEach(b => {
+        const o = document.createElement('option');
+        o.value = b; o.textContent = b;
+        sel.appendChild(o);
+    });
+}
+
+function updateResultsCount(n) {
+    const el = document.getElementById('resultsCount');
+    if (el) el.textContent = `${n} listing${n !== 1 ? 's' : ''} found`;
+}
+
+/* ════════════════════════════════════════════════════
+   SAVE / WISHLIST
+   ════════════════════════════════════════════════════ */
+function toggleSave(id, btn) {
+    const idx = state.saved.indexOf(id);
+    if (idx > -1) {
+        state.saved.splice(idx, 1);
+        showToast('Removed from saved vehicles.', 'info');
+    } else {
+        state.saved.push(id);
+        showToast('Saved to your wishlist! ❤️', 'success');
+    }
+    localStorage.setItem('jerry_saved', JSON.stringify(state.saved));
+    updateCounters();
+
+    // Update just this button — no full re-render
+    const saved = state.saved.includes(id);
+    btn.className = `vc-save-btn ${saved ? 'saved' : ''}`;
+    btn.innerHTML = `<i class='bx ${saved ? 'bxs-heart' : 'bx-heart'}'></i>`;
+    btn.title = saved ? 'Remove from saved' : 'Save this car';
+
+    // If saved view is open, re-render it
+    if (document.getElementById('view-saved').classList.contains('active')) {
+        renderSavedView();
+    }
+}
+
+function renderSavedView() {
+    const items = state.vehicles.filter(c => state.saved.includes(c.id));
+    const count = document.getElementById('savedCount');
+    if (count) count.textContent = `${items.length} saved`;
+
+    if (items.length === 0) {
+        document.getElementById('savedGrid').innerHTML = `
+            <div class="empty-state">
+                <i class='bx bx-heart'></i>
+                <h3>No saved vehicles yet</h3>
+                <p>Tap the heart icon on any listing to save it here.</p>
+                <button class="btn-primary" data-nav="marketplace" onclick="switchView('marketplace')">
+                    Browse Marketplace
+                </button>
+            </div>`;
+        return;
+    }
+    renderGrid(items, 'savedGrid');
+}
+
+/* ════════════════════════════════════════════════════
+   COMPARE
+   ════════════════════════════════════════════════════ */
+function toggleCompare(id) {
+    const idx = state.compare.indexOf(id);
+    if (idx > -1) {
+        state.compare.splice(idx, 1);
+        showToast('Removed from comparison.', 'info');
+    } else {
+        if (state.compare.length >= 3) {
+            showToast('You can compare up to 3 vehicles at once.', 'warning');
+            return;
+        }
+        state.compare.push(id);
+        showToast('Added to comparison.', 'success');
+    }
+    localStorage.setItem('jerry_compare', JSON.stringify(state.compare));
+    updateCounters();
+
+    // Refresh marketplace grid to update button state
+    renderGrid(state.filtered.length ? state.filtered : state.vehicles, 'vehicleFeed');
+
+    if (document.getElementById('view-compare').classList.contains('active')) {
+        renderCompareView();
+    }
+}
+
+function renderCompareView() {
+    const container = document.getElementById('compareContainer');
+    const items = state.vehicles.filter(c => state.compare.includes(c.id));
+
+    if (items.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class='bx bx-git-compare'></i>
+                <h3>No vehicles selected</h3>
+                <p>Click "Compare" on any listing in the Marketplace to add it here.</p>
+                <button class="btn-primary" onclick="switchView('marketplace')">Browse Marketplace</button>
+            </div>`;
+        return;
+    }
+
+    // Find best values for highlighting
+    const minPrice   = Math.min(...items.map(c => c.price   || Infinity));
+    const minMileage = Math.min(...items.map(c => c.mileage || Infinity));
+    const maxYear    = Math.max(...items.map(c => c.year    || 0));
+
+    let html = `
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>Specification</th>
+                    ${items.map(c => `<th>
+                        ${escHtml(c.make)} ${escHtml(c.model)}
+                        <i class='bx bx-x compare-remove' title="Remove" onclick="toggleCompare('${c.id}')"></i>
+                    </th>`).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Year</td>
+                    ${items.map(c => `<td class="${c.year === maxYear ? 'compare-best' : ''}">${c.year || '—'}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td>Price</td>
+                    ${items.map(c => `<td class="${c.price === minPrice ? 'compare-best' : ''}">
+                        ₦${Number(c.price || 0).toLocaleString()}
+                    </td>`).join('')}
+                </tr>
+                <tr>
+                    <td>Mileage</td>
+                    ${items.map(c => `<td class="${c.mileage === minMileage ? 'compare-best' : ''}">
+                        ${c.mileage ? Number(c.mileage).toLocaleString() + ' km' : '—'}
+                    </td>`).join('')}
+                </tr>
+                <tr>
+                    <td>Transmission</td>
+                    ${items.map(c => `<td>${c.transmission || '—'}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td>Fuel Type</td>
+                    ${items.map(c => `<td>${c.fuelType || '—'}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td>Seller</td>
+                    ${items.map(c => `<td>${escHtml(c.sellerAlias || 'Verified Dealer')}</td>`).join('')}
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size:12px;color:var(--success);margin-top:12px;">
+            <i class='bx bx-info-circle'></i> Green = best value in this category
+        </p>`;
+
+    container.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════
+   CHAT
+   ════════════════════════════════════════════════════ */
+function contactSeller(sellerUid) {
+    if (!sellerUid || sellerUid === 'undefined' || sellerUid === 'null') {
+        showToast('This listing is missing seller info — try refreshing the page.', 'error');
+        console.warn('contactSeller called with invalid sellerUid:', sellerUid);
+        return;
+    }
+    if (!window._fbUser) {
+        showToast('Please sign in to message a seller.', 'warning');
+        return;
+    }
+    /* Open chat page with both the sellerId and role so it knows who we are */
+    window.location.href = `chat.html?role=buyer&sellerId=${encodeURIComponent(sellerUid)}`;
+}
+
+function switchActiveThread(sellerAlias, el) {
+    document.getElementById('chatActiveHeader').textContent = sellerAlias;
+    document.querySelectorAll('.chat-thread-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInputField');
+    const text  = input.value.trim();
+    if (!text) return;
+
+    const area = document.getElementById('chatMessagesArea');
+    const now  = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg sent';
+    msg.innerHTML = `${escHtml(text)}<div class="chat-msg-time">${now}</div>`;
+    area.appendChild(msg);
+
+    input.value = '';
+    area.scrollTop = area.scrollHeight;
+
+    // Auto reply
+    setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = 'chat-msg received';
+        reply.innerHTML = `Thanks for reaching out! We'll get back to you shortly.
+            <div class="chat-msg-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
+        area.appendChild(reply);
+        area.scrollTop = area.scrollHeight;
+    }, 1200);
+}
+
+/* ════════════════════════════════════════════════════
+   NAVIGATION
+   ════════════════════════════════════════════════════ */
+function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item[data-view]').forEach(el => el.classList.remove('active'));
+
+    const view = document.getElementById(`view-${viewId}`);
+    const nav  = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+    if (view) view.classList.add('active');
+    if (nav)  nav.classList.add('active');
+
+    // Per-view lazy render
+    if (viewId === 'saved')    renderSavedView();
+    if (viewId === 'compare')  renderCompareView();
+
+    // Close mobile sidebar
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('active-mobile');
+    }
+}
+
+function bindNavigation() {
+    // Sidebar nav items
+    document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+        item.addEventListener('click', () => switchView(item.dataset.view));
+    });
+
+    // Any element with data-nav attribute (topbar buttons, banner button, stat cards)
+    document.querySelectorAll('[data-nav]').forEach(el => {
+        el.addEventListener('click', () => switchView(el.dataset.nav));
+    });
+
+    // Logout — delegates to Firebase module
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to log out?')) {
+            window.firebaseSignOut();
+        }
+    });
+
+    // Mobile sidebar toggle
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        const sb = document.getElementById('sidebar');
+        if (window.innerWidth <= 768) {
+            sb.classList.toggle('active-mobile');
+        } else {
+            sb.classList.toggle('collapsed');
+        }
+    });
+}
+
+function bindFilters() {
+    ['searchFilter', 'brandFilter', 'fuelFilter', 'sortFilter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', applyFilters);
+    });
+}
+
+function bindUI() {
+    // Theme toggle
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+
+    // Chat send
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    if (chatSendBtn) chatSendBtn.addEventListener('click', sendMessage);
+
+    const chatInputField = document.getElementById('chatInputField');
+    if (chatInputField) {
+        chatInputField.addEventListener('keydown', e => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    }
+
+    // Profile save — delegates to Firebase module
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    if (saveProfileBtn) {
+        saveProfileBtn.addEventListener('click', () => {
+            window.saveFirebaseProfile();
+        });
+    }
+
+    // Clear compare
+    const clearCompareBtn = document.getElementById('clearCompareBtn');
+    if (clearCompareBtn) {
+        clearCompareBtn.addEventListener('click', () => {
+            state.compare = [];
+            localStorage.setItem('jerry_compare', JSON.stringify(state.compare));
+            updateCounters();
+            renderCompareView();
+            showToast('Comparison cleared.', 'info');
+        });
+    }
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            body.classList.toggle('open');
+            icon.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+        });
+    });
+}
+
+/* ════════════════════════════════════════════════════
+   THEME
+   ════════════════════════════════════════════════════ */
+function applyTheme() {
+    if (state.theme === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+        document.getElementById('themeIcon').className = 'bx bx-sun';
+    }
+}
+
+function toggleTheme() {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    document.body.toggleAttribute('data-theme', state.theme === 'dark');
+    if (state.theme === 'dark') document.body.setAttribute('data-theme', 'dark');
+    else document.body.removeAttribute('data-theme');
+    document.getElementById('themeIcon').className = state.theme === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+    localStorage.setItem('jerry_theme', state.theme);
+}
+
+/* ════════════════════════════════════════════════════
+   PROFILE
+   applyProfile() is kept as a shim for any legacy calls.
+   The real work happens in applyProfileUI() defined in the
+   Firebase module above, called by onAuthStateChanged.
+   ════════════════════════════════════════════════════ */
+function applyProfile() {
+    /* Called before Firebase resolves — sets a safe loading state */
+    const name  = state.profile.name  || 'Loading…';
+    const photo = state.profile.photo || null;
+    const email = state.profile.email || '';
+    if (window.applyProfileUI) window.applyProfileUI(name, photo, email);
+    /* No localStorage write — Firebase Auth is the single source of truth */
+}
+
+/* ════════════════════════════════════════════════════
+   COUNTERS
+   ════════════════════════════════════════════════════ */
+function updateCounters() {
+    document.getElementById('statSaved').textContent   = state.saved.length;
+    document.getElementById('statCompare').textContent = state.compare.length;
+}
+
+function markAllRead() {
+    document.getElementById('notifBadge').style.display = 'none';
+    showToast('All notifications marked as read.', 'success');
+}
+
+/* ════════════════════════════════════════════════════
+   SKELETON LOADER
+   ════════════════════════════════════════════════════ */
+function showSkeletons(containerId, count) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = Array(count).fill(`
+        <div class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-body">
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short"></div>
+            </div>
+        </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════════ */
+function showToast(message, type = 'info') {
+    const icons = { info: 'bx-info-circle', success: 'bx-check-circle', error: 'bx-error-circle', warning: 'bx-error' };
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i class='bx ${icons[type] || icons.info}'></i> ${escHtml(message)}`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-in forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+
+/* ════════════════════════════════════════════════════
+   SECURITY — XSS SANITISER
+   ════════════════════════════════════════════════════ */
+function escHtml(str) {
+    if (!str && str !== 0) return '';
+    const d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+}
+</script>
+</body>
+</html>
