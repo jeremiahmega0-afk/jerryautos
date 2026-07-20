@@ -659,8 +659,7 @@ import { initializeApp }                           from "firebase/app";
 import { getAuth, onAuthStateChanged, signOut,
          updateProfile as fbUpdateProfile }        from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc,
-         collection, query, where, orderBy, onSnapshot,
-         addDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+         collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { getStorage, ref as storageRef,
          uploadBytesResumable, getDownloadURL }    from "firebase/storage";
 
@@ -884,14 +883,17 @@ const app = {
         });
 
         /* Chat */
-        // document.getElementById('chat-send-btn').addEventListener('click', () => {
-        //     const input = document.getElementById('chat-input');
-        //     this.sendChatMessage(input.value);
-        //     input.value = '';
-        // });
-            // document.getElementById('chat-input').addEventListener('keydown', (e) => {
-            //     if (e.key === 'Enter') { this.sendChatMessage(e.target.value); e.target.value = ''; }
-            // });
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatInput   = document.getElementById('chat-input');
+        if (chatSendBtn && chatInput) {
+            chatSendBtn.addEventListener('click', () => {
+                this.sendChatMessage(chatInput.value);
+                chatInput.value = '';
+            });
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { this.sendChatMessage(e.target.value); e.target.value = ''; }
+            });
+        }
 
         /* ── Settings: photo upload ── */
         document.getElementById('change-photo-btn').addEventListener('click', () => {
@@ -919,48 +921,37 @@ const app = {
 
         onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
-                /* ── Resolve display name and photo from all sources ── */
-                let name     = firebaseUser.displayName || '';
-                let photoURL = firebaseUser.photoURL    || null;
-                let phone    = '';
-                let city     = '';
+                let name  = firebaseUser.displayName || '';
+                let phone = '';
+                let city  = '';
 
                 try {
                     const snap = await getDoc(doc(db, 'sellers', firebaseUser.uid));
                     if (snap.exists()) {
                         const data = snap.data();
-                        /* fullName is what the user typed at signup — prefer it */
-                        if (data.fullName)  name     = data.fullName;
-                        else if (data.username && !name) name = data.username;
-                        /* Firestore photoURL trumps Auth photoURL for email signups */
-                        if (data.photoURL)  photoURL = data.photoURL;
+                        if (!name && data.username) name = data.username;
                         phone = data.phone || '';
                         city  = data.city  || '';
                     }
-                } catch (err) {
-                    console.warn('Could not load seller Firestore doc:', err);
-                }
+                } catch (_) { /* swallow — use Auth fallbacks */ }
 
-                /* Last fallback */
                 if (!name) name = firebaseUser.email?.split('@')[0] || 'Seller';
 
                 this.state.currentUser = {
                     uid:      firebaseUser.uid,
                     name,
                     email:    firebaseUser.email || '',
-                    photoURL,
+                    photoURL: firebaseUser.photoURL || null,
                     phone,
                     city,
                 };
 
-                /* Stamp ALL identity UI elements */
-                applyUserUI(name, photoURL, firebaseUser.email);
+                /* Stamp ALL identity UI in one call */
+                applyUserUI(name, firebaseUser.photoURL, firebaseUser.email);
 
                 /* Pre-fill extra settings fields */
-                const phoneEl = document.getElementById('settings-phone');
-                const cityEl  = document.getElementById('settings-city');
-                if (phoneEl) phoneEl.value = phone;
-                if (cityEl)  cityEl.value  = city;
+                document.getElementById('settings-phone').value = phone;
+                document.getElementById('settings-city').value  = city;
 
                 if (firstCall) {
                     this.showToast(`Welcome back, ${name}! 👋`, 'success');
@@ -972,20 +963,20 @@ const app = {
 
             } else {
                 this.state.currentUser = null;
-                firstCall = true;
+                firstCall = true; // reset so next sign-in triggers navigate
 
+                /* Clear all identity UI */
                 const placeholder = avatarUrl('?');
-                const setEl = (id, prop, val) => { const el = document.getElementById(id); if (el) el[prop] = val; };
-                setEl('topbar-avatar',  'src',       placeholder);
-                setEl('topbar-avatar',  'className',  'avatar-img');
-                setEl('sidebar-avatar', 'src',        placeholder);
-                setEl('sidebar-name',   'textContent','Not signed in');
-                setEl('user-greeting',  'textContent','Not signed in');
-                setEl('settings-avatar','src',        placeholder);
-                setEl('settings-name',  'value',      '');
-                setEl('settings-email', 'value',      '');
-                setEl('settings-phone', 'value',      '');
-                setEl('settings-city',  'value',      '');
+                document.getElementById('topbar-avatar').src           = placeholder;
+                document.getElementById('topbar-avatar').classList.remove('loading');
+                document.getElementById('sidebar-avatar').src          = placeholder;
+                document.getElementById('sidebar-name').textContent    = 'Not signed in';
+                document.getElementById('user-greeting').textContent   = 'Not signed in';
+                document.getElementById('settings-avatar').src         = placeholder;
+                document.getElementById('settings-name').value         = '';
+                document.getElementById('settings-email').value        = '';
+                document.getElementById('settings-phone').value        = '';
+                document.getElementById('settings-city').value         = '';
                 const ring = document.querySelector('.sidebar-avatar-ring');
                 if (ring) ring.classList.add('hidden');
 
@@ -1171,100 +1162,50 @@ const app = {
     },
 
     /* ────────────────────────────
-       FIRESTORE — VEHICLE INVENTORY
-       All vehicle data now lives in the `vehicles` Firestore
-       collection — no server.js needed.
-       Schema: { make, model, year, price, mileage, transmission,
-                 fuelType, image, sellerId, sellerName, sellerPhoto,
-                 status, createdAt, updatedAt }
+       EXPRESS API — BASE URL
     ──────────────────────────── */
+    API: 'http://localhost:5000/api',
 
-    /* Subscribe to this seller's vehicles in real-time */
-    subscribeInventory() {
-        if (this._unsubInventory) { this._unsubInventory(); this._unsubInventory = null; }
-        if (!this.state.currentUser) { this.state.inventory = []; return; }
-
-        const uid = this.state.currentUser.uid;
-
-        /* Ordered query — requires a Firestore composite index on
-           (sellerId ASC, createdAt DESC). If the index doesn't exist yet
-           Firestore throws a FAILED_PRECONDITION error with a link to
-           create it. We catch that and fall back to an unordered query
-           so the dashboard still works while the index is being built. */
-        const orderedQ = query(
-            collection(db, 'vehicles'),
-            where('sellerId', '==', uid),
-            orderBy('createdAt', 'desc')
-        );
-        const fallbackQ = query(
-            collection(db, 'vehicles'),
-            where('sellerId', '==', uid)
-        );
-
-        const applySnap = (snap) => {
-            this.state.inventory = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            this.renderInventory();
-            this.renderDashboard();
-        };
-
-        this._unsubInventory = onSnapshot(orderedQ, applySnap, (err) => {
-            if (err.code === 'failed-precondition') {
-                /* Index not built yet — log the link Firestore includes in
-                   the error message so the developer can click to create it */
-                console.warn(
-                    'Firestore composite index missing for vehicles query.\n' +
-                    'Create it here (link from Firestore):', err.message
-                );
-                this.showToast(
-                    'Building search index… listings will appear shortly.',
-                    'info'
-                );
-                /* Fall back to unordered snapshot while index builds */
-                this._unsubInventory = onSnapshot(fallbackQ, applySnap, (err2) => {
-                    console.error('Inventory snapshot fallback error:', err2);
-                    this.showToast('Could not load inventory from Firestore.', 'error');
-                });
-            } else {
-                console.error('Inventory snapshot error:', err);
-                this.showToast('Could not load inventory from Firestore.', 'error');
-            }
-        });
-    },
-
+    /* ────────────────────────────
+       EXPRESS API — INVENTORY
+    ──────────────────────────── */
     async loadInventory() {
-        this.subscribeInventory();
+        if (!this.state.currentUser) { this.state.inventory = []; return; }
+        try {
+            const res = await fetch(`${this.API}/vehicles?sellerId=${this.state.currentUser.uid}`);
+            if (!res.ok) throw new Error(`Server ${res.status}`);
+            const data = await res.json();
+            this.state.inventory = data.map(v => ({ ...v, id: v.id || v._id }));
+        } catch (err) {
+            console.error('loadInventory error:', err);
+            this.showToast('Could not reach server — showing cached data.', 'warning');
+        }
     },
 
-    /* Add a new vehicle listing to Firestore */
     async addVehicle(data) {
-        const user = this.state.currentUser;
-        await addDoc(collection(db, 'vehicles'), {
-            ...data,
-            sellerId:    user.uid,
-            sellerName:  user.name    || 'Verified Dealer',
-            sellerPhoto: user.photoURL || '',
-            status:      data.status  || 'Available',
-            createdAt:   serverTimestamp(),
-            updatedAt:   serverTimestamp(),
+        const payload = { ...data, sellerId: this.state.currentUser.uid };
+        const res = await fetch(`${this.API}/vehicles`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
-        this.showToast('Vehicle listed successfully!', 'success');
-        // onSnapshot will update state.inventory automatically
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || res.status); }
+        const { vehicle } = await res.json();
+        this.state.inventory.push({ ...vehicle, id: vehicle.id || vehicle._id });
+        this.showToast('Vehicle listed!', 'success');
     },
 
-    /* Update an existing vehicle in Firestore */
     async updateVehicle(id, data) {
-        const user = this.state.currentUser;
-        await updateDoc(doc(db, 'vehicles', id), {
-            ...data,
-            sellerName:  user.name    || 'Verified Dealer',
-            sellerPhoto: user.photoURL || '',
-            updatedAt:   serverTimestamp(),
+        const res = await fetch(`${this.API}/vehicles/${id}`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...data, sellerId: this.state.currentUser.uid })
         });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || res.status); }
+        const { vehicle } = await res.json();
+        const idx = this.state.inventory.findIndex(v => v.id === id);
+        if (idx !== -1) this.state.inventory[idx] = { ...vehicle, id: vehicle.id || vehicle._id };
         this.showToast('Vehicle updated!', 'success');
-        // onSnapshot will reflect the change automatically
     },
 
-    /* Delete a vehicle from Firestore */
     async deleteVehicle(id) {
         if (!confirm('Remove this vehicle from your listings?')) return;
         const vehicle = this.state.inventory.find(v => v.id === id);
@@ -1273,11 +1214,13 @@ const app = {
             this.showToast('Permission denied.', 'error'); return;
         }
         try {
-            await deleteDoc(doc(db, 'vehicles', id));
+            const res = await fetch(`${this.API}/vehicles/${id}?sellerId=${this.state.currentUser.uid}`, { method: 'DELETE' });
+            if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error || res.status); }
+            this.state.inventory = this.state.inventory.filter(v => v.id !== id);
+            this.renderInventory();
+            this.renderDashboard();
             this.showToast('Vehicle removed.', 'success');
-            // onSnapshot will remove it from state.inventory automatically
         } catch (err) {
-            console.error('deleteVehicle error:', err);
             this.showToast(`Delete failed: ${err.message}`, 'error');
         }
     },
@@ -1515,4 +1458,4 @@ window.app = app;
 document.addEventListener('DOMContentLoaded', () => app.init());
 </script>
 </body>
-</html>
+</html> 

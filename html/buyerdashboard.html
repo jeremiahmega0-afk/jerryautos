@@ -1007,6 +1007,49 @@ window.firebaseSignOut = async function() {
     }
 };
 
+/* ════════════════════════════════════════════════════
+   EXPOSE FIRESTORE VEHICLE SUBSCRIPTION
+   Called by the plain app script (loadMarketplace).
+   Returns an unsubscribe function.
+   Listens to the `vehicles` collection in real-time —
+   only Available listings, ordered newest-first.
+   ════════════════════════════════════════════════════ */
+window._subscribeVehicles = function(onData, onError) {
+    /* Ordered query requires a Firestore composite index on
+       (status ASC, createdAt DESC). Falls back to unordered
+       if the index hasn't been created yet. */
+    const orderedQ = query(
+        collection(db, 'vehicles'),
+        where('status', '==', 'Available'),
+        orderBy('createdAt', 'desc')
+    );
+    const fallbackQ = query(
+        collection(db, 'vehicles'),
+        where('status', '==', 'Available')
+    );
+
+    const normalize = (snap) => snap.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        make:  d.data().make  || '',
+        model: d.data().model || '',
+    }));
+
+    let unsub = onSnapshot(orderedQ, (snap) => {
+        onData(normalize(snap));
+    }, (err) => {
+        if (err.code === 'failed-precondition') {
+            console.warn('Firestore index missing for vehicles. Falling back to unordered.', err.message);
+            unsub = onSnapshot(fallbackQ, (snap) => onData(normalize(snap)), onError);
+        } else {
+            onError(err);
+        }
+    });
+
+    // Return a cleanup function that always unsubscribes the current listener
+    return () => unsub && unsub();
+};
+
 </script>
 
 <!-- ════════════════════ APP SCRIPT ════════════════════ -->
@@ -1014,8 +1057,6 @@ window.firebaseSignOut = async function() {
 /* ════════════════════════════════════════════════════
    CONSTANTS
    ════════════════════════════════════════════════════ */
-const API_BASE = 'http://localhost:5000/api';
-
 /* ════════════════════════════════════════════════════
    STATE
    ════════════════════════════════════════════════════ */
@@ -1046,56 +1087,63 @@ document.addEventListener('DOMContentLoaded', () => {
    GET /api/vehicles  (no sellerId → public buyer view)
    Server strips sellerId, returns only Available cars
    ════════════════════════════════════════════════════ */
-async function loadMarketplace() {
+/* ════════════════════════════════════════════════════
+   FIRESTORE — SUBSCRIBE TO PUBLIC VEHICLE LISTINGS
+   Replaced the old Express GET /api/vehicles fetch.
+   Uses window._subscribeVehicles exposed by the Firebase
+   module above — real-time, no server.js needed.
+   ════════════════════════════════════════════════════ */
+let _unsubVehicles = null;
+
+function loadMarketplace() {
     showSkeletons('recommendedGrid', 2);
     showSkeletons('vehicleFeed', 4);
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    // Unsubscribe any previous listener before opening a new one
+    if (_unsubVehicles) { _unsubVehicles(); _unsubVehicles = null; }
 
-    try {
-        const res = await fetch(`${API_BASE}/vehicles`, { signal: controller.signal });
-        clearTimeout(timeout);
-
-        if (!res.ok) throw new Error(`Server returned ${res.status}`);
-
-        const data = await res.json();
-
-        // Normalise id — server sends both id and _id
-        state.vehicles = data.map(v => ({ ...v, id: v.id || v._id }));
-        state.filtered  = [...state.vehicles];
-
-        populateBrandDropdown();
-        updateCounters();
-
-        // Recommended: first 3 listings
-        renderGrid(state.vehicles.slice(0, 3), 'recommendedGrid');
-        renderGrid(state.vehicles, 'vehicleFeed');
-
-        document.getElementById('statListings').textContent = state.vehicles.length;
-        updateResultsCount(state.vehicles.length);
-
-    } catch (err) {
-        clearTimeout(timeout);
-        const isTimeout = err.name === 'AbortError';
-        const msg = isTimeout
-            ? 'Server took too long to respond. Is it running?'
-            : 'Could not connect to the server. Make sure it is running on port 5000.';
-
-        showToast(msg, 'error');
-
-        const errHTML = `
-            <div class="empty-state" style="grid-column:1/-1">
-                <i class='bx bx-wifi-off'></i>
-                <h3>Cannot reach server</h3>
-                <p>${msg}</p>
-                <button class="btn-primary" onclick="loadMarketplace()">
-                    <i class='bx bx-refresh'></i> Retry
-                </button>
-            </div>`;
-        document.getElementById('vehicleFeed').innerHTML = errHTML;
-        document.getElementById('recommendedGrid').innerHTML = errHTML;
+    // _subscribeVehicles is exposed by the Firebase module script above
+    if (!window._subscribeVehicles) {
+        showToast('Firebase not ready — please refresh.', 'error');
+        return;
     }
+
+    _unsubVehicles = window._subscribeVehicles(
+        // onData — called immediately and on every change
+        (vehicles) => {
+            state.vehicles = vehicles;
+            state.filtered  = [...vehicles];
+
+            populateBrandDropdown();
+            updateCounters();
+
+            renderGrid(state.vehicles.slice(0, 3), 'recommendedGrid');
+            renderGrid(state.vehicles, 'vehicleFeed');
+
+            document.getElementById('statListings').textContent = state.vehicles.length;
+            updateResultsCount(state.vehicles.length);
+        },
+        // onError
+        (err) => {
+            console.error('Vehicle subscription error:', err);
+            const msg = err.code === 'permission-denied'
+                ? 'Firestore permission denied — check your security rules.'
+                : 'Could not load listings from Firebase. Check your connection.';
+            showToast(msg, 'error');
+
+            const errHTML = `
+                <div class="empty-state" style="grid-column:1/-1">
+                    <i class='bx bx-wifi-off'></i>
+                    <h3>Could not load listings</h3>
+                    <p>${msg}</p>
+                    <button class="btn-primary" onclick="loadMarketplace()">
+                        <i class='bx bx-refresh'></i> Retry
+                    </button>
+                </div>`;
+            document.getElementById('vehicleFeed').innerHTML = errHTML;
+            document.getElementById('recommendedGrid').innerHTML = errHTML;
+        }
+    );
 }
 
 /* ════════════════════════════════════════════════════
@@ -1124,7 +1172,7 @@ function renderGrid(dataset, targetId) {
         const price      = car.price ? `₦${Number(car.price).toLocaleString()}` : 'Contact seller';
         const mileage    = car.mileage ? `${Number(car.mileage).toLocaleString()} km` : '—';
         const fuel       = (car.fuelType || 'Verified').toLowerCase();
-        const seller     = car.sellerAlias || 'Verified Dealer';
+        const seller     = car.sellerName || car.sellerAlias || 'Verified Dealer';
 
         const card = document.createElement('div');
         card.className = 'vehicle-card';
@@ -1184,7 +1232,7 @@ function applyFilters() {
     // Search: make, model, year, seller alias
     if (search) {
         list = list.filter(c =>
-            `${c.make} ${c.model} ${c.year} ${c.sellerAlias || ''}`.toLowerCase().includes(search)
+            `${c.make} ${c.model} ${c.year} ${c.sellerName || c.sellerAlias || ''}`.toLowerCase().includes(search)
         );
     }
 
@@ -1350,7 +1398,7 @@ function renderCompareView() {
                 </tr>
                 <tr>
                     <td>Seller</td>
-                    ${items.map(c => `<td>${escHtml(c.sellerAlias || 'Verified Dealer')}</td>`).join('')}
+                    ${items.map(c => `<td>${escHtml(c.sellerName || c.sellerAlias || 'Verified Dealer')}</td>`).join('')}
                 </tr>
             </tbody>
         </table>
@@ -1471,39 +1519,27 @@ function bindFilters() {
 
 function bindUI() {
     // Theme toggle
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+    document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
 
     // Chat send
-    const chatSendBtn = document.getElementById('chatSendBtn');
-    if (chatSendBtn) chatSendBtn.addEventListener('click', sendMessage);
-
-    const chatInputField = document.getElementById('chatInputField');
-    if (chatInputField) {
-        chatInputField.addEventListener('keydown', e => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    }
+    document.getElementById('chatSendBtn').addEventListener('click', sendMessage);
+    document.getElementById('chatInputField').addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendMessage();
+    });
 
     // Profile save — delegates to Firebase module
-    const saveProfileBtn = document.getElementById('saveProfileBtn');
-    if (saveProfileBtn) {
-        saveProfileBtn.addEventListener('click', () => {
-            window.saveFirebaseProfile();
-        });
-    }
+    document.getElementById('saveProfileBtn').addEventListener('click', () => {
+        window.saveFirebaseProfile();
+    });
 
     // Clear compare
-    const clearCompareBtn = document.getElementById('clearCompareBtn');
-    if (clearCompareBtn) {
-        clearCompareBtn.addEventListener('click', () => {
-            state.compare = [];
-            localStorage.setItem('jerry_compare', JSON.stringify(state.compare));
-            updateCounters();
-            renderCompareView();
-            showToast('Comparison cleared.', 'info');
-        });
-    }
+    document.getElementById('clearCompareBtn').addEventListener('click', () => {
+        state.compare = [];
+        localStorage.setItem('jerry_compare', JSON.stringify(state.compare));
+        updateCounters();
+        renderCompareView();
+        showToast('Comparison cleared.', 'info');
+    });
 
     // FAQ accordion
     document.querySelectorAll('.faq-header').forEach(header => {
